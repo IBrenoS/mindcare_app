@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Responsividade
 
 class PasswordRecoveryScreen extends StatefulWidget {
+  const PasswordRecoveryScreen({super.key});
+
   @override
   _PasswordRecoveryScreenState createState() => _PasswordRecoveryScreenState();
 }
@@ -8,12 +11,27 @@ class PasswordRecoveryScreen extends StatefulWidget {
 class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  bool _isButtonDisabled = true; // Controla se o botão está desabilitado
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(
+        _checkEmailValidity); // Listener para habilitar/desabilitar o botão
+  }
+
+  void _checkEmailValidity() {
+    setState(() {
+      _isButtonDisabled =
+          _emailController.text.isEmpty || !_emailController.text.contains('@');
+    });
+  }
 
   void _sendRecoveryEmail() {
     if (_formKey.currentState!.validate()) {
       // Simulação do envio de e-mail de recuperação
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('E-mail de recuperação enviado!'),
           backgroundColor: Colors.green,
         ),
@@ -28,11 +46,19 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Recuperação de Senha'),
+        title: Text(
+          'Recuperação de Senha',
+          style: TextStyle(fontSize: 20.sp), // Fonte adaptada
+        ),
         backgroundColor: Colors.lightBlue.shade700,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back,
+              color: Colors.white), // Ícone customizado
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w), // Padding adaptado
         child: Form(
           key: _formKey,
           child: Column(
@@ -41,14 +67,18 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               Text(
                 'Insira seu e-mail cadastrado para recuperar sua senha.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.sp), // Fonte adaptada
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 24.h), // Espaçamento adaptado
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'E-mail',
-                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 12.h, horizontal: 16.w), // Padding ajustado
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.r), // Borda adaptada
+                  ),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -61,20 +91,36 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 24.h), // Espaçamento adaptado
               ElevatedButton(
-                onPressed: _sendRecoveryEmail,
-                child: Text('Recuperar Senha'),
+                onPressed: _isButtonDisabled
+                    ? null
+                    : _sendRecoveryEmail, // Desabilita o botão quando inválido
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlue.shade700,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  textStyle: TextStyle(fontSize: 18),
+                  backgroundColor: _isButtonDisabled
+                      ? Colors.grey.shade400
+                      : Colors.lightBlue
+                          .shade700, // Cor do botão desabilitada/habilitada
+                  foregroundColor:
+                      Colors.white, // Cor do texto definida como branca
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 50.w, // Padding adaptado
+                    vertical: 15.h, // Padding adaptado
+                  ),
+                  textStyle: TextStyle(fontSize: 18.sp), // Fonte adaptada
                 ),
+                child: const Text('Recuperar Senha'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 }

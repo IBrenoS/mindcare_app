@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Importando flutter_screenutil
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -10,18 +13,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
 
   final List<Widget> _onboardingSlides = [
-    OnboardingSlide(
+    const OnboardingSlide(
       imageAsset: 'assets/images/meditation.png',
       title: 'Meditações Guiadas',
       description: 'Aproveite meditações para relaxar e acalmar sua mente.',
     ),
-    OnboardingSlide(
-      imageAsset: 'assets/images/check_in.png',
+    const OnboardingSlide(
+      imageAsset: 'assets/images/mental_health.png',
       title: 'Check-ins Emocionais',
       description: 'Registre como você se sente diariamente.',
     ),
-    OnboardingSlide(
-      imageAsset: 'assets/images/diary.png',
+    const OnboardingSlide(
+      imageAsset: 'assets/images/writing.png',
       title: 'Diário Pessoal',
       description: 'Anote seus pensamentos e reflexões.',
     ),
@@ -30,7 +33,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _onNextPage() {
     if (_currentPage < _onboardingSlides.length - 1) {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
     } else {
@@ -70,9 +73,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               (index) => _buildPageIndicator(index),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 20.h), // Espaçamento adaptado
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.w), // Padding adaptado
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -80,7 +83,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPressed: _onSkip,
                   child: Text(
                     'Pular',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16.sp), // Tamanho de fonte adaptado
                   ),
                 ),
                 ElevatedButton(
@@ -89,12 +94,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _currentPage == _onboardingSlides.length - 1
                         ? 'Começar'
                         : 'Próximo',
+                    style: TextStyle(fontSize: 16.sp), // Fonte adaptada
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 20.h), // Espaçamento adaptado
         ],
       ),
     );
@@ -102,9 +108,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildPageIndicator(int index) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
-      width: _currentPage == index ? 12.0 : 8.0,
-      height: _currentPage == index ? 12.0 : 8.0,
+      margin: EdgeInsets.symmetric(horizontal: 4.w), // Margem adaptada
+      width: _currentPage == index ? 12.w : 8.w, // Largura adaptada
+      height: _currentPage == index ? 12.h : 8.h, // Altura adaptada
       decoration: BoxDecoration(
         color: _currentPage == index ? Colors.blue : Colors.grey,
         shape: BoxShape.circle,
@@ -119,6 +125,7 @@ class OnboardingSlide extends StatelessWidget {
   final String description;
 
   const OnboardingSlide({
+    super.key,
     required this.imageAsset,
     required this.title,
     required this.description,
@@ -127,29 +134,29 @@ class OnboardingSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.w), // Padding adaptado
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
             imageAsset,
-            height: 200.0,
+            height: 200.h, // Altura da imagem adaptada
             fit: BoxFit.contain,
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 20.h), // Espaçamento adaptado
           Text(
             title,
             style: TextStyle(
-              fontSize: 24.0,
+              fontSize: 24.sp, // Tamanho da fonte adaptado
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 20.h), // Espaçamento adaptado
           Text(
             description,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16.0,
+              fontSize: 16.sp, // Tamanho da fonte adaptado
             ),
           ),
         ],
