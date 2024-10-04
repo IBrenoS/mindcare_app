@@ -39,6 +39,7 @@ dependencies:
   mime: ^1.0.6
   cupertino_icons: ^1.0.8
   url_launcher: ^6.3.0
+  logger: ^2.4.0
 
 
 dev_dependencies:

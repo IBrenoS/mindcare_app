@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async'; // Para TimeoutException
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:logger/logger.dart';
 
 class AuthToken {
   final String value;
@@ -19,6 +21,7 @@ class ApiService {
   final String baseUrl =
       "https://mindcare-bb0ea3046931.herokuapp.com"; // URL do seu backend
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final logger = Logger();
 
   String? currentUserId; // Armazena o ID do usuário logado
 
@@ -32,8 +35,13 @@ class ApiService {
   Future<http.Response> getRequest(Endpoint endpoint) async {
     final url = Uri.parse('$baseUrl${endpoint.value}');
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
       rethrow;
     }
@@ -52,9 +60,13 @@ class ApiService {
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer ${token.value}',
         'Content-Type': 'application/json',
-      });
-
+      }).timeout(const Duration(seconds: 10));
       return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
       rethrow;
     }
@@ -65,12 +77,19 @@ class ApiService {
       Endpoint endpoint, Map<String, dynamic> data) async {
     final url = Uri.parse('$baseUrl${endpoint.value}');
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(data),
+          )
+          .timeout(const Duration(seconds: 10));
       return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
       rethrow;
     }
@@ -82,21 +101,29 @@ class ApiService {
     final url = Uri.parse(
         '${baseUrl.endsWith('/') ? baseUrl : '$baseUrl/'}${endpoint.value.startsWith('/') ? endpoint.value.substring(1) : endpoint.value}');
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer ${token.value}',
-          'Content-Type': 'application/json'
-        },
-        body: jsonEncode(data),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {
+              'Authorization': 'Bearer ${token.value}',
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode(data),
+          )
+          .timeout(const Duration(seconds: 10));
       return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
       rethrow;
     }
   }
 
- Future<Map<String, dynamic>> getNearbySupportPoints({
+  // Função para buscar pontos de apoio próximos
+  Future<Map<String, dynamic>> getNearbySupportPoints({
     required double latitude,
     required double longitude,
     List<String>? queries,
@@ -105,7 +132,6 @@ class ApiService {
     String? type,
     String? sortBy,
   }) async {
-    // Construir os parâmetros da query string
     Map<String, String> queryParams = {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
@@ -131,18 +157,23 @@ class ApiService {
         Uri.parse('$baseUrl/geo/nearby').replace(queryParameters: queryParams);
 
     try {
-      final response = await http.get(uri);
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200 && response.body.isNotEmpty) {
-        print('Resposta recebida: ${response.body}');
+        logger.i('Resposta recebida: ${response.body}');
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data;
       } else {
-        print('Erro: ${response.statusCode}');
+        logger.e('Erro: ${response.statusCode}');
         throw Exception('Falha ao carregar pontos de apoio');
       }
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
-      print('Erro ao buscar pontos de apoio: $e');
+      logger.e('Erro ao buscar pontos de apoio: $e');
       rethrow;
     }
   }
@@ -161,7 +192,7 @@ class ApiService {
     }
   }
 
-  // Função atualizada para lidar com o envio de imagens de forma mais robusta
+  // Função para enviar post com imagem
   Future<void> createPostWithImage(String content, File? image) async {
     final token = await _getToken();
     final url = Uri.parse('$baseUrl/community/createPost');
@@ -170,16 +201,14 @@ class ApiService {
       final request = http.MultipartRequest('POST', url)
         ..headers['Authorization'] = 'Bearer ${token.value}';
 
-      // Adiciona a legenda como campo obrigatório
       request.fields['content'] = content;
 
-      // Verifica se a imagem foi fornecida e adiciona ao request
       if (image != null) {
         final mimeType = lookupMimeType(image.path) ?? 'image/jpeg';
         final mimeParts = mimeType.split('/');
 
         final imageFile = await http.MultipartFile.fromPath(
-          'image', // Certifique-se de que este campo corresponde ao backend
+          'image',
           image.path,
           contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
@@ -189,14 +218,12 @@ class ApiService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      // Verificação de sucesso na criação da postagem
       if (response.statusCode != 201) {
         throw Exception('Erro ao criar postagem: ${response.body}');
       }
     } catch (e) {
-      print('Erro ao enviar imagem: $e');
-      throw Exception(
-          'Erro ao criar postagem.'); // Retorna o erro para o frontend
+      logger.e('Erro ao enviar imagem: $e');
+      throw Exception('Erro ao criar postagem.');
     }
   }
 
@@ -204,11 +231,7 @@ class ApiService {
   Future<void> likePost(String postId) async {
     final token = await _getToken();
     final response = await postRequestWithAuth(
-        Endpoint('/community/likePost'),
-        {
-          'postId': postId,
-        },
-        token);
+        Endpoint('/community/likePost'), {'postId': postId}, token);
 
     if (response.statusCode != 200) {
       throw Exception('Erro ao curtir postagem.');
@@ -219,29 +242,21 @@ class ApiService {
   Future<void> unlikePost(String postId) async {
     final token = await _getToken();
     final response = await postRequestWithAuth(
-      Endpoint('/community/unlikePost'),
-      {'postId': postId},
-      token,
-    );
+        Endpoint('/community/unlikePost'), {'postId': postId}, token);
 
     if (response.statusCode != 200) {
       throw Exception('Erro ao remover curtida.');
     }
   }
 
-  // Função para adicionar um comentário a uma postagem
+  // Função para adicionar comentário a uma postagem
   Future<void> addComment(String postId, String comment) async {
-    if (comment.isEmpty) {
-      return;
-    }
+    if (comment.isEmpty) return;
 
     final token = await _getToken();
     final response = await postRequestWithAuth(
         Endpoint('/community/addComment'),
-        {
-          'postId': postId,
-          'comment': comment,
-        },
+        {'postId': postId, 'comment': comment},
         token);
 
     if (response.statusCode != 200) {
@@ -256,7 +271,7 @@ class ApiService {
 
     if (response.statusCode == 200 && response.body.isNotEmpty) {
       final data = jsonDecode(response.body);
-      currentUserId = data['id']; // Atualiza o ID do usuário logado
+      currentUserId = data['id'];
       return data;
     } else {
       throw Exception('Erro ao carregar perfil do usuário.');

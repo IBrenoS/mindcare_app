@@ -16,6 +16,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Set<Marker> _markers = {};
   bool _isLoading = true;
+  bool _hasError = false;
 
   // Variáveis para filtros e paginação
   String? _selectedServiceType; // CRAS ou Clínicas
@@ -70,6 +71,7 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+ // Verificar o valor das queries baseado no filtro selecionado
   Future<void> _loadSupportPoints() async {
     if (_currentPosition == null) return;
 
@@ -94,7 +96,7 @@ class _MapScreenState extends State<MapScreen> {
         queries: queries,
         page: _currentPage,
         limit: 20,
-        type: _selectedEstablishmentType, // Público ou Privado
+        type: _selectedEstablishmentType,
       );
 
       List<dynamic> results = data['results'];
@@ -314,19 +316,26 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           _currentPosition == null
               ? Center(child: CircularProgressIndicator())
-              : GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(_currentPosition!.latitude,
-                        _currentPosition!.longitude),
-                    zoom: 14,
-                  ),
-                  markers: _markers,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                ),
+              : _hasError
+                  ? Center(
+                      child: Text(
+                        'Erro ao carregar pontos de apoio.',
+                        style: TextStyle(color: Colors.red, fontSize: 18),
+                      ),
+                    )
+                  : GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(_currentPosition!.latitude,
+                            _currentPosition!.longitude),
+                        zoom: 14,
+                      ),
+                      markers: _markers,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: false,
+                      mapToolbarEnabled: false,
+                    ),
           if (_isLoading)
             Center(
               child: CircularProgressIndicator(),
