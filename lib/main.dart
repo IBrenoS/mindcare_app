@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Importando flutter_screenutil
-
-import './screens/home/home_screen.dart'; // Importe a tela Home
-import './screens/login/login_screen.dart'; // Importe a tela de Login
-import './screens/onboarding/onboarding_screen.dart'; // Importe a tela de Onboarding
-import './screens/password_recovery/password_recovery_screen.dart'; // Importe a tela de Recuperação de Senha
-import './screens/register/register_screen.dart'; // Importe a tela de Registro
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import './screens/register/register_screen.dart';
+import './screens/community/community_screen.dart';
+import './screens/content/content_screen.dart';
+import './screens/diary/diary_screen.dart';
+import './screens/exercises/exercises_screen.dart';
+import './screens/gamification/gamification_screen.dart';
+import './screens/home/home_screen.dart';
+import './screens/login/login_screen.dart';
+import './screens/profile/profile_screen.dart';
+import 'screens/map/map_screen.dart';
+import './screens/password_recovery/password_recovery_screen.dart';
+import './screens/verify_code/verify_code_screen.dart';
+import './screens/reset_password/reset_password_screen.dart';
+import './screens/theme/theme_provider.dart';
+import './screens/theme/theme_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,42 +29,90 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize:
-          const Size(360, 800), // Definindo a base de referência para Android
-      minTextAdapt: true, // Adapta o tamanho do texto
-      splitScreenMode: true, // Suporte ao modo de tela dividida
+      designSize: const Size(360, 800),
+      minTextAdapt: true,
+      splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          title: 'MindCare',
-          theme: ThemeData(
-            primarySwatch: Colors.lightBlue,
-            fontFamily: 'Poppins', // Aplica Poppins globalmente
-            textTheme: TextTheme(
-              bodyLarge: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.normal), // Tamanho de fonte adaptado
-              bodyMedium: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.normal), // Tamanho de fonte adaptado
-              titleLarge: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold), // Títulos adaptados
-              labelLarge: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600), // Botões adaptados
-            ),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ],
+          child: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              return MaterialApp(
+                title: 'MindCare',
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                themeMode: themeProvider.themeMode,
+                home: const AuthCheck(),
+                routes: {
+                  '/login': (context) => const LoginScreen(),
+                  '/register': (context) => const RegisterScreen(),
+                  '/password-recovery': (context) =>
+                      const PasswordRecoveryScreen(),
+                  '/verify-code': (context) => VerifyCodeScreen(
+                        email: '',
+                      ),
+                  '/reset-password': (context) => ResetPasswordScreen(
+                        email: '',
+                        code: '',
+                      ),
+                  '/home': (context) => const HomeScreen(),
+                  '/community': (context) => CommunityScreen(),
+                  '/content': (context) => ContentScreen(),
+                  '/diary': (context) => const DiaryScreen(),
+                  '/exercises': (context) => ExercisesScreen(),
+                  '/gamification': (context) => GamificationScreen(),
+                  '/map': (context) => MapScreen(),
+                  '/profile': (context) => UserProfileScreen(),
+                },
+              );
+            },
           ),
-          initialRoute:
-              '/login', // Define a tela inicial (pode ser /onboarding se preferir)
-          routes: {
-            '/login': (context) => const LoginScreen(),
-            '/register': (context) => const RegisterScreen(),
-            '/password-recovery': (context) => PasswordRecoveryScreen(),
-            '/onboarding': (context) => const OnboardingScreen(),
-            '/home': (context) => HomeScreen(),
-          },
         );
+      },
+    );
+  }
+}
+
+class AuthCheck extends StatelessWidget {
+  const AuthCheck({super.key});
+
+  Future<bool> _isUserAuthenticated() async {
+    final storage = const FlutterSecureStorage();
+    String? token = await storage.read(key: 'authToken');
+
+    if (token != null && token.isNotEmpty) {
+      // Verifique se o token está expirado usando o JwtDecoder
+      bool isExpired = JwtDecoder.isExpired(token);
+
+      if (!isExpired) {
+        // Se o token não estiver expirado, o usuário está autenticado
+        return true;
+      } else {
+        // Se o token estiver expirado, apague-o para forçar o login
+        await storage.delete(key: 'authToken');
+      }
+    }
+    return false; // Retorna falso se o token estiver ausente ou expirado
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _isUserAuthenticated(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasData && snapshot.data == true) {
+          return const HomeScreen();
+        }
+
+        return const LoginScreen();
       },
     );
   }

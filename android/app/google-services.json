@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "670957239136",
+    "project_id": "mindcare-fire",
+    "storage_bucket": "mindcare-fire.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670957239136:android:e3c3253c3f8055eea77c05",
+        "android_client_info": {
+          "package_name": "br.com.mindcareapp.mindcare_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_8JDv_q9hIvJlwkgSLZq_9LGK7EGnpqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
