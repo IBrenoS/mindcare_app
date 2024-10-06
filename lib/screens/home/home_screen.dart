@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mindcare_app/screens/community/community_screen.dart';
 import 'package:mindcare_app/screens/exercises/exercises_screen.dart';
 import 'package:mindcare_app/screens/map/map_screen.dart';
-import 'package:mindcare_app/screens/diary/diary_screen.dart';
+import 'package:mindcare_app/screens/diary/diarioHumor_screen.dart';
 import 'package:mindcare_app/screens/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Container(color: Colors.white), // Tela Home vazia por enquanto
     ExercisesScreen(), // Tela de meditação ou exercícios
     MapScreen(), // Tela do mapa substituindo gamificação
-    DiaryScreen(), // Tela de diário
+    DiarioHumorScreen(), // Tela de diário
     CommunityScreen(), // Tela de comunidade
     UserProfileScreen(), // Tela de perfil do usuário
   ];

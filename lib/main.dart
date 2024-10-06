@@ -6,7 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import './screens/register/register_screen.dart';
 import './screens/community/community_screen.dart';
 import './screens/content/content_screen.dart';
-import './screens/diary/diary_screen.dart';
+import 'screens/diary/diarioHumor_screen.dart';
 import './screens/exercises/exercises_screen.dart';
 import './screens/gamification/gamification_screen.dart';
 import './screens/home/home_screen.dart';
@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
                   '/home': (context) => const HomeScreen(),
                   '/community': (context) => CommunityScreen(),
                   '/content': (context) => ContentScreen(),
-                  '/diary': (context) => const DiaryScreen(),
+                  '/diary': (context) => DiarioHumorScreen(),
                   '/exercises': (context) => ExercisesScreen(),
                   '/gamification': (context) => GamificationScreen(),
                   '/map': (context) => MapScreen(),

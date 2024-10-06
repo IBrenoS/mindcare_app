@@ -264,6 +264,42 @@ class ApiService {
     }
   }
 
+  // Função para criar uma nova entrada no Diário de Humor
+  Future<void> createDiaryEntry(String moodEmoji, String entry) async {
+    final token = await _getToken();
+    final response = await postRequestWithAuth(
+      Endpoint('diary/createEntry'),
+      {
+        'moodEmoji': moodEmoji,
+        'entry': entry,
+      },
+      token,
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Erro ao criar entrada no diário de humor.');
+    }
+  }
+
+  // Função para buscar entradas de humor com filtros (diário, semanal, mensal)
+  Future<List<Map<String, dynamic>>> fetchDiaryEntries(String filter,
+      {int page = 1, int limit = 10}) async {
+    final token = await _getToken();
+
+    // Construir a URL com parâmetros de página e limite
+    final url =
+        Uri.parse('$baseUrl/diary/entries?filter=$filter&page=$page&limit=$limit');
+
+    final response = await getRequestWithAuth(Endpoint(url.toString()), token);
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      final data = jsonDecode(response.body) as List<dynamic>;
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      throw Exception('Erro ao carregar entradas do diário de humor.');
+    }
+  }
+
   // Função para buscar o perfil do usuário logado
   Future<Map<String, dynamic>> fetchUserProfile() async {
     final token = await _getToken();
