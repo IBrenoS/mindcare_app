@@ -444,7 +444,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 
                 // Scroll horizontal para emojis com botão de adicionar
                 Container(
-                  height: 80,
+                  height: 70,
                   child: Row(
                     children: [
                       Expanded(
