@@ -16,7 +16,6 @@ dependencies:
 
   flutter_screenutil: ^5.9.3
   smooth_page_indicator: ^1.2.0+3
-  fl_chart: ^0.69.0
   lottie: ^3.1.2
   provider: ^6.1.2
   cached_network_image: ^3.4.1
@@ -42,6 +41,8 @@ dependencies:
   logger: ^2.4.0
   intl: ^0.19.0
   flutter_spinkit: ^5.2.1
+  fl_chart: ^0.69.0
+  syncfusion_flutter_charts: ^27.1.52
 
 
 dev_dependencies:

@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mindcare_app/screens/settings/settings_screen.dart'; 
+import 'package:mindcare_app/screens/settings/settings_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   @override

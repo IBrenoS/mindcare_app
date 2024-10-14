@@ -122,6 +122,55 @@ class ApiService {
     }
   }
 
+  // Função genérica para requisição PUT com autenticação
+  Future<http.Response> putRequestWithAuth(
+      Endpoint endpoint, Map<String, dynamic> data, AuthToken token) async {
+    final url = Uri.parse('$baseUrl${endpoint.value}');
+    try {
+      final response = await http
+          .put(
+            url,
+            headers: {
+              'Authorization': 'Bearer ${token.value}',
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode(data),
+          )
+          .timeout(const Duration(seconds: 10));
+      return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Função genérica para requisição DELETE com autenticação
+  Future<http.Response> deleteRequestWithAuth(
+      Endpoint endpoint, AuthToken token) async {
+    final url = Uri.parse('$baseUrl${endpoint.value}');
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${token.value}',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+      return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Função para buscar pontos de apoio próximos
   Future<Map<String, dynamic>> getNearbySupportPoints({
     required double latitude,
@@ -268,7 +317,7 @@ class ApiService {
   Future<void> createDiaryEntry(String moodEmoji, String entry) async {
     final token = await _getToken();
     final response = await postRequestWithAuth(
-      Endpoint('diary/createEntry'),
+      Endpoint('/diary/entries'),
       {
         'moodEmoji': moodEmoji,
         'entry': entry,
@@ -277,26 +326,90 @@ class ApiService {
     );
 
     if (response.statusCode != 201) {
+      logger.e('Erro ao criar entrada: ${response.body}');
       throw Exception('Erro ao criar entrada no diário de humor.');
     }
   }
 
-  // Função para buscar entradas de humor com filtros (diário, semanal, mensal)
-  Future<List<Map<String, dynamic>>> fetchDiaryEntries(String filter,
+  // Função para buscar entradas de humor com filtros (daily, weekly, monthly)
+  Future<Map<String, dynamic>> fetchDiaryEntries(String filter,
       {int page = 1, int limit = 10}) async {
     final token = await _getToken();
 
-    // Construir a URL com parâmetros de página e limite
-    final url =
-        Uri.parse('$baseUrl/diary/entries?filter=$filter&page=$page&limit=$limit');
+    // Construir os parâmetros de consulta
+    Map<String, String> queryParams = {
+      'filter': filter,
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
 
-    final response = await getRequestWithAuth(Endpoint(url.toString()), token);
+    final uri =
+        Uri.parse('$baseUrl/diary/entries').replace(queryParameters: queryParams);
+
+    final response =
+        await getRequestWithAuth(Endpoint(uri.path + '?' + uri.query), token);
 
     if (response.statusCode == 200 && response.body.isNotEmpty) {
-      final data = jsonDecode(response.body) as List<dynamic>;
-      return List<Map<String, dynamic>>.from(data);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data;
     } else {
+      logger.e('Erro ao carregar entradas: ${response.body}');
       throw Exception('Erro ao carregar entradas do diário de humor.');
+    }
+  }
+
+  // Função para obter uma entrada específica do Diário de Humor
+  Future<Map<String, dynamic>> fetchDiaryEntryById(String entryId) async {
+    final token = await _getToken();
+    final response =
+        await getRequestWithAuth(Endpoint('/diary/entries/$entryId'), token);
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data;
+    } else if (response.statusCode == 404) {
+      throw Exception('Entrada não encontrada.');
+    } else {
+      logger.e('Erro ao carregar a entrada: ${response.body}');
+      throw Exception('Erro ao carregar a entrada do diário de humor.');
+    }
+  }
+
+  // Função para atualizar uma entrada existente no Diário de Humor
+  Future<void> updateDiaryEntry(String entryId,
+      {String? moodEmoji, String? entry}) async {
+    final token = await _getToken();
+
+    // Construir o corpo da requisição com os campos atualizados
+    Map<String, dynamic> data = {};
+    if (moodEmoji != null) data['moodEmoji'] = moodEmoji;
+    if (entry != null) data['entry'] = entry;
+
+    if (data.isEmpty) {
+      throw Exception('Nada para atualizar.');
+    }
+
+    final response = await putRequestWithAuth(
+      Endpoint('/diary/entries/$entryId'),
+      data,
+      token,
+    );
+
+    if (response.statusCode != 200) {
+      logger.e('Erro ao atualizar a entrada: ${response.body}');
+      throw Exception('Erro ao atualizar a entrada do diário de humor.');
+    }
+  }
+
+  // Função para deletar uma entrada do Diário de Humor
+  Future<void> deleteDiaryEntry(String entryId) async {
+    final token = await _getToken();
+    final response =
+        await deleteRequestWithAuth(Endpoint('/diary/entries/$entryId'), token);
+
+    if (response.statusCode != 200) {
+      logger.e('Erro ao deletar a entrada: ${response.body}');
+      throw Exception('Erro ao deletar a entrada do diário de humor.');
     }
   }
 

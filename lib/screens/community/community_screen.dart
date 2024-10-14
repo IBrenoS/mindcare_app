@@ -14,6 +14,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
   final ApiService apiService = ApiService();
   List<dynamic> posts = [];
   bool isLoading = true;
+  bool isLoadingMore = false; // Flag para controlar carregamento adicional
+  int currentPage = 1; // Página atual de postagens
+  final int postsPerPage = 10; // Número de postagens por página
+  final ScrollController _scrollController = ScrollController();
   TextEditingController _commentController = TextEditingController();
   TextEditingController _captionController =
       TextEditingController(); // Controlador para legenda da postagem
@@ -23,8 +27,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   void initState() {
     super.initState();
-    fetchPosts();
+    fetchPosts(); // Carrega a primeira página de postagens
     fetchUserProfile();
+
+    // Adiciona listener ao ScrollController para detectar quando chegar no final da lista
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !isLoadingMore) {
+        fetchMorePosts(); // Carrega mais postagens quando chega ao final
+      }
+    });
   }
 
   Future<void> fetchUserProfile() async {
@@ -39,14 +52,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
   }
 
-  Future<void> fetchPosts() async {
+   Future<void> fetchPosts() async {
     try {
       setState(() {
         isLoading = true;
       });
-      final fetchedPosts = await apiService.fetchPosts(1, 10);
+      final fetchedPosts =
+          await apiService.fetchPosts(currentPage, postsPerPage);
       setState(() {
-        posts = fetchedPosts;
+        posts =
+            fetchedPosts; // Inicializa a lista com a primeira página de postagens
         isLoading = false;
       });
     } catch (e) {
@@ -59,7 +74,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
   }
 
-  Future<void> toggleLikePost(String postId, bool isLiked) async {
+   // Função para carregar mais postagens ao rolar até o fim da lista
+  Future<void> fetchMorePosts() async {
+    try {
+      setState(() {
+        isLoadingMore = true; // Ativa a flag de carregamento adicional
+      });
+      currentPage++; // Incrementa o número da página
+      final fetchedPosts =
+          await apiService.fetchPosts(currentPage, postsPerPage);
+      if (fetchedPosts.isNotEmpty) {
+        setState(() {
+          posts.addAll(
+              fetchedPosts); // Adiciona mais postagens à lista existente
+        });
+      }
+      setState(() {
+        isLoadingMore = false; // Desativa a flag de carregamento adicional
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingMore =
+            false; // Garante que a flag seja desativada em caso de erro
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao carregar mais postagens')),
+      );
+    }
+  }
+
+   Future<void> toggleLikePost(String postId, bool isLiked) async {
     try {
       await apiService.likePost(postId);
       setState(() {
@@ -202,7 +246,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
- // Função para selecionar, editar e recortar a imagem antes de compartilhar
+  // Função para selecionar, editar e recortar a imagem antes de compartilhar
   Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -366,10 +410,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: fetchPosts,
+              onRefresh: () async {
+                currentPage = 1; // Reseta a página para 1 ao fazer refresh
+                await fetchPosts(); // Recarrega as postagens
+              },
               child: ListView.builder(
-                itemCount: posts.length,
+                controller: _scrollController, // Controlador de rolagem
+                itemCount: posts.length +
+                    (isLoadingMore ? 1 : 0), // Adiciona item de carregamento
                 itemBuilder: (context, index) {
+                  if (index == posts.length) {
+                    return Center(
+                      child:
+                          CircularProgressIndicator(), // Mostra um indicador de carregamento ao final da lista
+                    );
+                  }
                   final post = posts[index];
                   bool isLiked = post['isLikedByCurrentUser'] ?? false;
                   return Column(
@@ -383,8 +438,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         title: Text(post["userId"]["name"] ?? 'Usuário'),
                         subtitle: Text(
                           formatarTempoEmPortugues(
-                            DateTime.parse(post[
-                                "createdAt"]), // Converte a data para DateTime se necessário
+                            DateTime.parse(post["createdAt"]),
                           ),
                         ),
                       ),
@@ -392,15 +446,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: AspectRatio(
-                            aspectRatio:
-                                1, // Ajusta para uma proporção de 1:1 (quadrada)
+                            aspectRatio: 1,
                             child: Image.network(
                               post["imageUrl"],
-                              fit: BoxFit
-                                  .cover, // Ajusta a imagem para cobrir a área sem distorcer
+                              fit: BoxFit.cover,
                               width: double.infinity,
-                              height:
-                                  200, // Define um tamanho consistente para todas as imagens
+                              height: 200,
                             ),
                           ),
                         ),

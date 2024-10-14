@@ -71,7 +71,7 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
- // Verificar o valor das queries baseado no filtro selecionado
+  // Verificar o valor das queries baseado no filtro selecionado
   Future<void> _loadSupportPoints() async {
     if (_currentPosition == null) return;
 

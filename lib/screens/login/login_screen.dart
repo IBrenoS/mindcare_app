@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:mindcare_app/screens/home/home_screen.dart';
 import 'package:mindcare_app/screens/password_recovery/password_recovery_screen.dart';
@@ -286,9 +286,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Text(
               'Login',
               style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.sp,
-                  ),
+                color: Colors.white,
+                fontSize: 18.sp,
+              ),
             ),
           );
   }
