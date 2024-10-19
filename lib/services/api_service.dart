@@ -171,6 +171,20 @@ class ApiService {
     }
   }
 
+  // Função para buscar o perfil do usuário logado
+  Future<Map<String, dynamic>> fetchUserProfile() async {
+    final token = await _getToken();
+    final response = await getRequestWithAuth(Endpoint('/auth/profile'), token);
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      final data = jsonDecode(response.body);
+      currentUserId = data['id'];
+      return data;
+    } else {
+      throw Exception('Erro ao carregar perfil do usuário.');
+    }
+  }
+
   // Função para buscar pontos de apoio próximos
   Future<Map<String, dynamic>> getNearbySupportPoints({
     required double latitude,
@@ -413,17 +427,69 @@ class ApiService {
     }
   }
 
-  // Função para buscar o perfil do usuário logado
-  Future<Map<String, dynamic>> fetchUserProfile() async {
-    final token = await _getToken();
-    final response = await getRequestWithAuth(Endpoint('/auth/profile'), token);
-
-    if (response.statusCode == 200 && response.body.isNotEmpty) {
-      final data = jsonDecode(response.body);
-      currentUserId = data['id'];
-      return data;
-    } else {
-      throw Exception('Erro ao carregar perfil do usuário.');
-    }
+  // Função para listar vídeos pendentes de aprovação
+  Future<http.Response> getPendingVideos() async {
+    AuthToken token = await _getToken();
+    return getRequestWithAuth(Endpoint('/moderation/videos/pending'), token);
   }
+
+  // Função para aprovar um vídeo, enviando também a categoria
+  Future<http.Response> approveVideo(String videoId, String category) async {
+    AuthToken token = await _getToken();
+    Map<String, dynamic> data = {'category': category};
+    return postRequestWithAuth(
+        Endpoint('/moderation/videos/approve/$videoId'), data, token);
+  }
+
+  // Função para rejeitar um vídeo
+  Future<http.Response> rejectVideo(String videoId) async {
+    AuthToken token = await _getToken();
+    return postRequestWithAuth(Endpoint('/moderation/videos/reject/$videoId'), {}, token);
+  }
+
+  // Função para listar artigos pendentes de aprovação
+  Future<http.Response> getPendingArticles() async {
+    AuthToken token = await _getToken();
+    return getRequestWithAuth(Endpoint('/moderation/articles/pending'), token);
+  }
+
+  // Função para aprovar um artigo
+  Future<http.Response> approveArticle(String articleId) async {
+    AuthToken token = await _getToken();
+    return postRequestWithAuth(
+        Endpoint('/moderation/articles/approve/$articleId'), {}, token);
+  }
+
+  // Função para rejeitar um artigo
+  Future<http.Response> rejectArticle(String articleId) async {
+    AuthToken token = await _getToken();
+    return postRequestWithAuth(
+        Endpoint('/moderation/articles/reject/$articleId'), {}, token);
+  }
+
+  // Função para automatizar a busca de novos vídeos da YouTube API
+  Future<http.Response> automateVideoSearch(int limit) async {
+    AuthToken token = await _getToken();
+    Map<String, dynamic> data = {'limit': limit};
+    return postRequestWithAuth(Endpoint('/automate/videos'), data, token);
+  }
+
+  // Função para automatizar a busca de novos artigos da NewsAPI
+  Future<http.Response> automateArticleSearch(int limit) async {
+    AuthToken token = await _getToken();
+    Map<String, dynamic> data = {'limit': limit};
+    return postRequestWithAuth(Endpoint('/automate/articles'), data, token);
+  }
+
+  // Função para listar vídeos aprovados, com opção de filtrar por categoria
+  Future<http.Response> getApprovedVideos({String? category}) async {
+    String query = category != null ? '?category=$category' : '';
+    return getRequest(Endpoint('/exercises/videos$query'));
+  }
+
+  // Função para listar artigos aprovados
+  Future<http.Response> getApprovedArticles() async {
+    return getRequest(Endpoint('/educational/articles'));
+  }
+
 }

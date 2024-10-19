@@ -8,7 +8,7 @@ import 'package:mindcare_app/screens/login/login_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
-  final String code; // Código de verificação
+  final String code;
 
   const ResetPasswordScreen({Key? key, required this.email, required this.code})
       : super(key: key);
@@ -26,14 +26,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
-  // Variáveis recebidas inicializadas com valores padrão para evitar erros de inicialização tardia
   late String receivedEmail = widget.email.isNotEmpty ? widget.email : '';
   late String receivedCode = widget.code.isNotEmpty ? widget.code : '';
 
   @override
   void initState() {
     super.initState();
-    // Log para verificar as variáveis iniciais após a inicialização
+    // Apenas logs para depuração (pode ser removido em produção)
     print('E-mail recebido: $receivedEmail');
     print('Código de verificação recebido: $receivedCode');
   }
@@ -50,32 +49,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         final code = receivedCode.trim();
         final newPassword = _passwordController.text.trim();
 
-        // Logs para verificar o que está sendo enviado
-        print('Enviando redefinição de senha para:');
-        print('E-mail: $email');
-        print('Código de verificação: $code');
-        print('Nova senha: $newPassword');
-
-        // Enviando a nova senha para o backend
+        // Envio da nova senha para o backend
         final response = await http
             .post(
               Uri.parse(
                   'https://mindcare-bb0ea3046931.herokuapp.com/auth/resetPassword'),
               headers: <String, String>{
-                'Content-Type': 'application/json; charset=UTF-8',
+                'Content-Type': 'application/json; charset=UTF-8'
               },
               body: jsonEncode(<String, String>{
                 'email': email,
                 'code': code,
-                'newPassword': newPassword,
+                'newPassword': newPassword
               }),
             )
             .timeout(const Duration(seconds: 15));
 
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-        // Log para capturar a resposta do backend
-        print('Resposta do backend: ${response.statusCode} - ${response.body}');
 
         if (response.statusCode == 200) {
           setState(() {
@@ -84,8 +74,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
           _passwordController.clear();
           _confirmPasswordController.clear();
-
-          _showSuccessDialog();
+          _showSuccessDialog(); // Mostra o sucesso
         } else {
           final String errorMessage = responseData['msg'] ??
               'Erro inesperado. Verifique e tente novamente.';
@@ -95,20 +84,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         setState(() {
           _isLoading = false;
         });
-        print('Erro de Timeout ao redefinir senha.');
         _showError(
             'Tempo de conexão esgotado. Verifique sua conexão e tente novamente.');
       } on SocketException catch (_) {
         setState(() {
           _isLoading = false;
         });
-        print('Erro de Socket ao redefinir senha.');
         _showError('Sem conexão com a internet. Verifique sua conexão.');
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
-        print('Erro inesperado ao redefinir senha: $e');
         _showError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
       }
     }
@@ -120,8 +106,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Erro'),
-          content: Text(message),
+          title: const Text('Erro', style: TextStyle(color: Colors.red)),
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.red),
+              SizedBox(width: 10),
+              Expanded(child: Text(message)),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -141,19 +133,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sucesso'),
-          content: const Text('Senha redefinida com sucesso!'),
+          title: const Text('Sucesso', style: TextStyle(color: Colors.green)),
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 10),
+              Expanded(child: Text('Senha redefinida com sucesso!')),
+            ],
+          ),
           actions: [
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o diálogo
-                // Navegar para a tela de login
+                Navigator.of(context).pop(); // Fecha o diálogo
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (Route<dynamic> route) => false,
-                );
+                ); // Navega para a tela de login
               },
             ),
           ],
@@ -284,13 +281,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        )
-                      : Text(
-                          'Redefinir Senha',
+                              AlwaysStoppedAnimation<Color>(Colors.white))
+                      : Text('Redefinir Senha',
                           style:
-                              TextStyle(color: Colors.white, fontSize: 18.sp),
-                        ),
+                              TextStyle(color: Colors.white, fontSize: 18.sp)),
                 ),
               ],
             ),

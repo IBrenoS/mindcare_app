@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import './screens/register/register_screen.dart';
 import './screens/community/community_screen.dart';
+import './screens/content/content_management_screen.dart';
 import './screens/content/content_screen.dart';
 import 'screens/diary/diarioHumor_screen.dart';
 import './screens/exercises/exercises_screen.dart';
-import './screens/gamification/gamification_screen.dart';
 import './screens/home/home_screen.dart';
 import './screens/login/login_screen.dart';
 import './screens/profile/profile_screen.dart';
@@ -65,9 +65,9 @@ class MyApp extends StatelessWidget {
                   '/content': (context) => ContentScreen(),
                   '/diary': (context) => DiarioHumorScreen(),
                   '/exercises': (context) => ExercisesScreen(),
-                  '/gamification': (context) => GamificationScreen(),
                   '/map': (context) => MapScreen(),
                   '/profile': (context) => UserProfileScreen(),
+                  '/content-management': (context) => ContentManagementScreen(),
                 },
               );
             },

@@ -135,15 +135,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 350.w,
                     child: Column(
                       children: [
-                        _buildNameField(),
+                        _buildTextField(
+                          controller: _nameController,
+                          labelText: 'Nome Completo',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira seu nome completo';
+                            }
+                            return null;
+                          },
+                        ),
                         SizedBox(height: 16.h),
-                        _buildEmailField(),
+                        _buildTextField(
+                          controller: _emailController,
+                          labelText: 'E-mail',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira seu e-mail';
+                            }
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                .hasMatch(value)) {
+                              return 'Por favor, insira um e-mail válido';
+                            }
+                            return null;
+                          },
+                        ),
                         SizedBox(height: 16.h),
-                        _buildPhoneField(),
+                        _buildTextField(
+                          controller: _phoneController,
+                          labelText: 'Telefone',
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira seu número de telefone';
+                            }
+                            if (!RegExp(r'^\d{10,15}$').hasMatch(value)) {
+                              return 'Por favor, insira um número de telefone válido';
+                            }
+                            return null;
+                          },
+                        ),
                         SizedBox(height: 16.h),
-                        _buildPasswordField(),
+                        _buildPasswordField(
+                          controller: _passwordController,
+                          labelText: 'Senha',
+                          obscureText: _obscurePassword,
+                          onTapSuffix: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         SizedBox(height: 16.h),
-                        _buildConfirmPasswordField(),
+                        _buildPasswordField(
+                          controller: _confirmPasswordController,
+                          labelText: 'Confirmação de Senha',
+                          obscureText: _obscureConfirmPassword,
+                          onTapSuffix: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
+                          validator: (value) {
+                            if (value != _passwordController.text) {
+                              return 'As senhas não correspondem';
+                            }
+                            return null;
+                          },
+                        ),
                         SizedBox(height: 24.h),
                         _buildRegisterButton(),
                         SizedBox(height: 16.h),
@@ -160,12 +221,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildNameField() {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Function()? onTapSuffix,
+    String? Function(String?)? validator,
+  }) {
     return TextFormField(
-      controller: _nameController,
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
-        labelText: 'Nome Completo',
+        labelText: labelText,
         fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
         labelStyle: TextStyle(
@@ -174,78 +244,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderRadius: BorderRadius.circular(10.r),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
+        suffixIcon: onTapSuffix != null
+            ? IconButton(
+                icon:
+                    Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+                onPressed: onTapSuffix,
+              )
+            : null,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira seu nome completo';
-        }
-        return null;
-      },
+      validator: validator,
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String labelText,
+    bool obscureText = false,
+    Function()? onTapSuffix,
+    String? Function(String?)? validator,
+  }) {
     return TextFormField(
-      controller: _emailController,
+      controller: controller,
+      obscureText: obscureText,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
-        labelText: 'E-mail',
-        fillColor: Theme.of(context).colorScheme.surface,
-        filled: true,
-        labelStyle: TextStyle(
-            fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Theme.of(context).dividerColor),
-        ),
-      ),
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira seu e-mail';
-        }
-        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return 'Por favor, insira um e-mail válido';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildPhoneField() {
-    return TextFormField(
-      controller: _phoneController,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      decoration: InputDecoration(
-        labelText: 'Telefone',
-        fillColor: Theme.of(context).colorScheme.surface,
-        filled: true,
-        labelStyle: TextStyle(
-            fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Theme.of(context).dividerColor),
-        ),
-      ),
-      keyboardType: TextInputType.phone,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira seu número de telefone';
-        }
-        if (!RegExp(r'^\d{10,15}$').hasMatch(value)) {
-          return 'Por favor, insira um número de telefone válido';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return TextFormField(
-      controller: _passwordController,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      decoration: InputDecoration(
-        labelText: 'Senha',
+        labelText: labelText,
         fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
         labelStyle: TextStyle(
@@ -255,66 +278,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         suffixIcon: IconButton(
-          icon: Icon(
-            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          onPressed: () {
-            setState(() {
-              _obscurePassword = !_obscurePassword;
-            });
-          },
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+          onPressed: onTapSuffix,
         ),
       ),
-      obscureText: _obscurePassword,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira sua senha';
-        }
-        if (value.length < 6) {
-          return 'A senha deve ter pelo menos 6 caracteres';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildConfirmPasswordField() {
-    return TextFormField(
-      controller: _confirmPasswordController,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      decoration: InputDecoration(
-        labelText: 'Confirmação de Senha',
-        fillColor: Theme.of(context).colorScheme.surface,
-        filled: true,
-        labelStyle: TextStyle(
-            fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Theme.of(context).dividerColor),
-        ),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          onPressed: () {
-            setState(() {
-              _obscureConfirmPassword = !_obscureConfirmPassword;
-            });
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor, insira sua senha';
+            }
+            if (value.length < 6) {
+              return 'A senha deve ter pelo menos 6 caracteres';
+            }
+            return null;
           },
-        ),
-      ),
-      obscureText: _obscureConfirmPassword,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, confirme sua senha';
-        }
-        if (value != _passwordController.text) {
-          return 'As senhas não correspondem';
-        }
-        return null;
-      },
     );
   }
 

@@ -12,7 +12,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   bool _isLoggingOut = false;
   late AnimationController _controller;
@@ -25,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     // Inicializa o AnimationController para controlar a animação de fade
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
-      vsync: this,
+      vsync: this, // vsync agora funciona com múltiplos tickers
     );
 
     // Define a animação de fade de 1 (totalmente opaco) para 0 (totalmente transparente)

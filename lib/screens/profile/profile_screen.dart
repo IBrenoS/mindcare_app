@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindcare_app/screens/settings/settings_screen.dart';
+import 'package:mindcare_app/screens/content/content_management_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -32,6 +33,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _loadUserProfile();
+  }
+
+  @override
+  void dispose() {
+    // Limpa os controladores de texto para evitar vazamentos de memória
+    nameController.dispose();
+    emailController.dispose();
+    bioController.dispose();
+    currentPasswordController.dispose();
+    newPasswordController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserProfile() async {
@@ -219,18 +231,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Editar Perfil' : 'Perfil do Usuário'),
         actions: [
-          // Ícone de menu com opções de editar e configurações
           PopupMenuButton<String>(
-            icon: Icon(Icons.menu), // Ícone de menu
+            icon: Icon(Icons.menu),
             onSelected: (value) {
               if (value == 'edit') {
-                toggleEditMode(); // Alterna para o modo de edição
+                toggleEditMode();
               } else if (value == 'settings') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const SettingsScreen()), // Navega para a tela de configurações
+                      builder: (context) => const SettingsScreen()),
                 );
               }
             },
@@ -304,7 +314,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       if (userRole == 'moderator' || userRole == 'admin')
                         ElevatedButton(
                           onPressed: () {
-                            print('Gerenciar Conteúdos');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ContentManagementScreen()),
+                            );
                           },
                           child: Text('Gerenciar Conteúdos'),
                         ),

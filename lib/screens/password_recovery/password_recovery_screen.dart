@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mindcare_app/screens/theme/theme_screen.dart';
 import 'package:mindcare_app/screens/verify_code/verify_code_screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -60,15 +59,24 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Se o e-mail estiver cadastrado, um código de verificação será enviado.',
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Se o e-mail estiver cadastrado, um código de verificação será enviado.',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
+                  ),
+                ],
               ),
-              backgroundColor: successColor,
+              backgroundColor: Colors.green,
             ),
           );
 
+          // Navegar para a tela de verificação de código
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -94,9 +102,17 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Theme.of(context).colorScheme.onError),
+        content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.red),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: Theme.of(context).colorScheme.onError),
+              ),
+            ),
+          ],
         ),
         backgroundColor: Theme.of(context).colorScheme.error,
       ),
