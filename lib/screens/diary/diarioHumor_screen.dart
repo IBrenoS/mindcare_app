@@ -32,19 +32,19 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   // Variável para a busca
   String _searchQuery = '';
 
+  // Variável para o filtro
+  String _selectedFilter = 'Todas';
+
   @override
   void initState() {
     super.initState();
     _loadCustomEmojis();
-    _carregarHistorico();
     _initializeLocalization();
   }
 
+  @override
   void dispose() {
-    // Remove o foco dos campos de texto ao sair da tela
-    FocusScope.of(context).unfocus();
-    _entryController
-        .dispose(); // Também garantimos que o controlador de texto seja limpo
+    _entryController.dispose();
     super.dispose();
   }
 
@@ -111,40 +111,43 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
     } finally {
       setState(() {
         _isLoading = false;
-        Future.delayed(Duration(seconds: 2), () {
-          setState(() {
-            _isRegistered = false;
-          });
+      });
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          _isRegistered = false;
         });
       });
     }
   }
 
- void _carregarHistorico({bool refresh = false}) async {
+  void _carregarHistorico({bool refresh = false}) async {
     setState(() {
       _isFetchingMore = true;
     });
 
     if (refresh) {
       _page = 1;
-      _entradas
-          .clear(); // Limpa a lista para evitar duplicação de dados ao recarregar
+      _entradas.clear();
     }
 
     try {
-      Map<String, dynamic> response = await apiService
-          .fetchDiaryEntries('daily', page: _page, limit: _limit);
+      String filter;
+      if (_selectedFilter == 'Diário') {
+        filter = 'daily';
+      } else if (_selectedFilter == 'Semanal') {
+        filter = 'weekly';
+      } else if (_selectedFilter == 'Mensal') {
+        filter = 'monthly';
+      } else {
+        filter = '';
+      }
+
+      Map<String, dynamic> response = await apiService.fetchDiaryEntries(filter,
+          page: _page, limit: _limit);
       List<dynamic> novasEntradas = response['entries'];
 
-      // Filtrar possíveis entradas duplicadas
-      List<Map<String, dynamic>> entradasFiltradas =
-          List<Map<String, dynamic>>.from(novasEntradas).where((novaEntrada) {
-        return !_entradas.any((entradaExistente) =>
-            entradaExistente['_id'] == novaEntrada['_id']);
-      }).toList();
-
       setState(() {
-        _entradas.addAll(entradasFiltradas);
+        _entradas.addAll(List<Map<String, dynamic>>.from(novasEntradas));
         _page++;
       });
     } catch (e) {
@@ -157,7 +160,6 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       });
     }
   }
-
 
   Future<void> _initializeLocalization() async {
     try {
@@ -467,10 +469,8 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                                 decoration: BoxDecoration(
                                   color: _selectedEmoji == emoji
                                       ? Colors.blue
-                                      : Colors.grey[
-                                          200], // Aqui você define a cor de fundo e a borda
-                                  borderRadius: BorderRadius.circular(
-                                      10), // Aqui está a borda arredondada
+                                      : Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   emoji,
@@ -555,6 +555,32 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     "Histórico de Humor",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
+                ),
+                SizedBox(height: 10),
+
+                // Adicionar o filtro
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Filtrar:'),
+                    SizedBox(width: 10),
+                    DropdownButton<String>(
+                      value: _selectedFilter,
+                      items: ['Todas', 'Diário', 'Semanal', 'Mensal']
+                          .map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedFilter = newValue!;
+                          _carregarHistorico(refresh: true);
+                        });
+                      },
+                    ),
+                  ],
                 ),
                 SizedBox(height: 10),
 
@@ -671,11 +697,10 @@ class GraficoHumorScreen extends StatelessWidget {
           margin: EdgeInsets.all(
               16), // Adiciona uma margem para melhorar espaçamento
           primaryXAxis: DateTimeAxis(
-            minimum: DateTime(
-                2024, 1, 1), // Data mínima definida para o início de 2024
-            maximum: DateTime.now().add(Duration(
-                days:
-                    30)), // Data máxima definida para a data atual com 30 dias extras para visualização
+            minimum: data.isNotEmpty
+                ? data.last.date
+                : DateTime.now().subtract(Duration(days: 30)),
+            maximum: data.isNotEmpty ? data.first.date : DateTime.now(),
             intervalType: DateTimeIntervalType.days, // Exibir por dias
             edgeLabelPlacement: EdgeLabelPlacement
                 .shift, // Ajuste de labels para não cortar nas bordas

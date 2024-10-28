@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:async'; // Para TimeoutException
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_parser/http_parser.dart';
@@ -185,50 +185,45 @@ class ApiService {
     }
   }
 
-  // Função para buscar pontos de apoio próximos
-  Future<Map<String, dynamic>> getNearbySupportPoints({
+ // Função para buscar pontos de apoio próximos
+  Future<Map<String, dynamic>> fetchNearbySupportPoints({
     required double latitude,
     required double longitude,
-    List<String>? queries,
-    int page = 1,
-    int limit = 20,
-    String? type,
-    String? sortBy,
+    String? query,
+    int? limit = 20,
+    String? sortBy = 'distance',
   }) async {
-    Map<String, String> queryParams = {
+    final endpoint = Endpoint('/geo/nearby');
+    final token = await _getToken();
+
+    // Montar a URL com parâmetros de consulta
+    final url =
+        Uri.parse('$baseUrl${endpoint.value}').replace(queryParameters: {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
-      'page': page.toString(),
-      'limit': limit.toString(),
-    };
-
-    if (queries != null && queries.isNotEmpty) {
-      queryParams['query'] = queries.join(',');
-    } else {
-      queryParams['query'] = 'CRAS,Clínicas de Saúde Mental';
-    }
-
-    if (type != null) {
-      queryParams['type'] = type;
-    }
-
-    if (sortBy != null) {
-      queryParams['sortBy'] = sortBy;
-    }
-
-    final uri =
-        Uri.parse('$baseUrl/geo/nearby').replace(queryParameters: queryParams);
+      if (query != null) 'query': query,
+      if (limit != null) 'limit': limit.toString(),
+      if (sortBy != null) 'sortBy': sortBy,
+    });
 
     try {
-      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+      // Fazer a requisição GET com autenticação
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${token.value}',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200 && response.body.isNotEmpty) {
-        logger.i('Resposta recebida: ${response.body}');
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return data;
+        // Retornar dados decodificados do JSON
+        return jsonDecode(response.body);
       } else {
-        logger.e('Erro: ${response.statusCode}');
-        throw Exception('Falha ao carregar pontos de apoio');
+        // Log de erro caso a resposta não seja bem-sucedida
+        logger.e('Erro ao buscar pontos de apoio: ${response.body}');
+        throw Exception(
+            'Erro ao buscar pontos de apoio: ${response.statusCode}');
       }
     } on SocketException {
       throw Exception('Falha na conexão. Verifique sua internet.');
@@ -236,7 +231,6 @@ class ApiService {
       throw Exception(
           'Tempo de resposta esgotado. Tente novamente mais tarde.');
     } catch (e) {
-      logger.e('Erro ao buscar pontos de apoio: $e');
       rethrow;
     }
   }
@@ -346,16 +340,19 @@ class ApiService {
   }
 
   // Função para buscar entradas de humor com filtros (daily, weekly, monthly)
-  Future<Map<String, dynamic>> fetchDiaryEntries(String filter,
+ Future<Map<String, dynamic>> fetchDiaryEntries(String filter,
       {int page = 1, int limit = 10}) async {
     final token = await _getToken();
 
     // Construir os parâmetros de consulta
     Map<String, String> queryParams = {
-      'filter': filter,
       'page': page.toString(),
       'limit': limit.toString(),
     };
+
+    if (filter.isNotEmpty) {
+      queryParams['filter'] = filter;
+    }
 
     final uri =
         Uri.parse('$baseUrl/diary/entries').replace(queryParameters: queryParams);
@@ -427,69 +424,161 @@ class ApiService {
     }
   }
 
-  // Função para listar vídeos pendentes de aprovação
-  Future<http.Response> getPendingVideos() async {
-    AuthToken token = await _getToken();
-    return getRequestWithAuth(Endpoint('/moderation/videos/pending'), token);
+  // Função para listar vídeos pendentes de aprovação com paginação
+  Future<http.Response> getPendingVideos(
+      {int page = 1, int limit = 10, String? category}) async {
+    try {
+      AuthToken token = await _getToken();
+      // Define os parâmetros da URL, incluindo página, limite e categoria (opcional)
+      String queryParams = '?page=$page&limit=$limit';
+      if (category != null) {
+        queryParams += '&category=$category';
+      }
+      return await getRequestWithAuth(
+          Endpoint('/moderation/videos/pending$queryParams'), token);
+    } catch (e) {
+      throw Exception("Erro ao buscar vídeos pendentes: ${e.toString()}");
+    }
   }
 
   // Função para aprovar um vídeo, enviando também a categoria
   Future<http.Response> approveVideo(String videoId, String category) async {
-    AuthToken token = await _getToken();
-    Map<String, dynamic> data = {'category': category};
-    return postRequestWithAuth(
-        Endpoint('/moderation/videos/approve/$videoId'), data, token);
-  }
-
-  // Função para rejeitar um vídeo
-  Future<http.Response> rejectVideo(String videoId) async {
-    AuthToken token = await _getToken();
-    return postRequestWithAuth(Endpoint('/moderation/videos/reject/$videoId'), {}, token);
-  }
-
-  // Função para listar artigos pendentes de aprovação
-  Future<http.Response> getPendingArticles() async {
-    AuthToken token = await _getToken();
-    return getRequestWithAuth(Endpoint('/moderation/articles/pending'), token);
-  }
-
-  // Função para aprovar um artigo
-  Future<http.Response> approveArticle(String articleId) async {
-    AuthToken token = await _getToken();
-    return postRequestWithAuth(
-        Endpoint('/moderation/articles/approve/$articleId'), {}, token);
-  }
-
-  // Função para rejeitar um artigo
-  Future<http.Response> rejectArticle(String articleId) async {
-    AuthToken token = await _getToken();
-    return postRequestWithAuth(
-        Endpoint('/moderation/articles/reject/$articleId'), {}, token);
-  }
-
-  // Função para automatizar a busca de novos vídeos da YouTube API
-  Future<http.Response> automateVideoSearch(int limit) async {
-    AuthToken token = await _getToken();
-    Map<String, dynamic> data = {'limit': limit};
-    return postRequestWithAuth(Endpoint('/automate/videos'), data, token);
-  }
-
-  // Função para automatizar a busca de novos artigos da NewsAPI
-  Future<http.Response> automateArticleSearch(int limit) async {
-    AuthToken token = await _getToken();
-    Map<String, dynamic> data = {'limit': limit};
-    return postRequestWithAuth(Endpoint('/automate/articles'), data, token);
+    try {
+      final token = await _getToken();
+      return await postRequestWithAuth(
+        Endpoint(
+            '/moderation/videos/approve/$videoId'), // Define a URL diretamente no Endpoint
+        {'category': category}, // Inclui a categoria no corpo da requisição
+        token,
+      );
+    } catch (e) {
+      throw Exception("Erro ao aprovar vídeo: ${e.toString()}");
+    }
   }
 
   // Função para listar vídeos aprovados, com opção de filtrar por categoria
   Future<http.Response> getApprovedVideos({String? category}) async {
-    String query = category != null ? '?category=$category' : '';
-    return getRequest(Endpoint('/exercises/videos$query'));
+    try {
+      // Obtenha o token de autenticação
+      final token = await _getToken();
+      if (token.value.isEmpty) {
+        return http.Response('{"msg":"Acesso negado. Sem token."}', 401);
+      }
+
+      // Construa a URL com a categoria como query parameter, se for fornecida
+      final url = Uri.parse('$baseUrl/exercises/videos').replace(
+        queryParameters: {
+          if (category != null)
+            'category': category, // Adiciona categoria se não for nulo
+        },
+      );
+
+      // Faça a requisição GET com cabeçalho de autenticação
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${token.value}',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
+    } catch (e) {
+      throw Exception("Erro ao buscar vídeos aprovados: ${e.toString()}");
+    }
   }
 
-  // Função para listar artigos aprovados
-  Future<http.Response> getApprovedArticles() async {
-    return getRequest(Endpoint('/educational/articles'));
+  // Função para rejeitar um vídeo
+  Future<http.Response> rejectVideo(String videoId) async {
+    try {
+      AuthToken token = await _getToken();
+      return await postRequestWithAuth(
+          Endpoint('/moderation/videos/reject/$videoId'), {}, token);
+    } catch (e) {
+      throw Exception("Erro ao rejeitar vídeo: ${e.toString()}");
+    }
+  }
+
+ //---------------------------------------------------------------------------
+
+
+  // Função para listar artigos pendentes de aprovação com paginação
+  Future<http.Response> getPendingArticles(
+      {int page = 1, int limit = 10}) async {
+    try {
+      AuthToken token = await _getToken();
+      // Define os parâmetros da URL para a paginação
+      String queryParams = '?page=$page&limit=$limit';
+      return await getRequestWithAuth(
+          Endpoint('/moderation/articles/pending$queryParams'), token);
+    } catch (e) {
+      throw Exception("Erro ao buscar artigos pendentes: ${e.toString()}");
+    }
+  }
+
+  // Função para aprovar um artigo
+  Future<http.Response> approveArticle(String articleId) async {
+    try {
+      AuthToken token = await _getToken();
+      return await postRequestWithAuth(
+          Endpoint('/moderation/articles/approve/$articleId'), {}, token);
+    } catch (e) {
+      throw Exception("Erro ao aprovar artigo: ${e.toString()}");
+    }
+  }
+
+ // Função para listar artigos aprovados com paginação
+  Future<http.Response> getApprovedArticles(
+      {int page = 1, int limit = 10}) async {
+    try {
+      // Obtenha o token de autenticação
+      final token = await _getToken();
+      if (token.value.isEmpty) {
+        return http.Response('{"msg":"Acesso negado. Sem token."}', 401);
+      }
+
+      // Construa a URL com base no baseUrl e parâmetros de paginação
+      final url = Uri.parse('$baseUrl/educational/articles').replace(
+        queryParameters: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+        },
+      );
+
+      // Faça a requisição GET com cabeçalho de autenticação
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${token.value}',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      return response;
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
+    } catch (e) {
+      throw Exception("Erro ao buscar artigos aprovados: ${e.toString()}");
+    }
+  }
+
+  // Função para rejeitar um artigo
+  Future<http.Response> rejectArticle(String articleId) async {
+    try {
+      AuthToken token = await _getToken();
+      return await postRequestWithAuth(
+          Endpoint('/moderation/articles/reject/$articleId'), {}, token);
+    } catch (e) {
+      throw Exception("Erro ao rejeitar artigo: ${e.toString()}");
+    }
   }
 
 }

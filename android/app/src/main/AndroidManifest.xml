@@ -8,55 +8,69 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Permissão de localização em segundo plano (para Android 10 e superior) -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Permissão para notificações (necessário no Android 13 e superior) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:label="MindCare App"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:enableOnBackInvokedCallback="true"
+        android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
-        android:hardwareAccelerated="false"> <!-- Desabilitando a aceleração de hardware para evitar problemas de GPU -->
+        android:enableOnBackInvokedCallback="true">
 
         <!-- Chave da API do Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAkXTYqhYo2KDo86wi1QP-ObEwgH3AYGxY" /> <!-- Substitua YOUR_GOOGLE_MAPS_API_KEY pela sua chave real -->
+            android:value="${MAPS_API_KEY}" />
 
         <!-- Habilitar visualização híbrida para Flutter -->
         <meta-data
             android:name="io.flutter.embedded_views_preview"
-            android:value="true" /> <!-- Necessário para visualizar componentes nativos como Google Maps -->
+            android:value="true" />
+
+        <!-- Meta-data para OneSignal -->
+        <meta-data
+            android:name="com.onesignal.NotificationOpened.DEFAULT"
+            android:value="DISABLE" />
+        <meta-data
+            android:name="com.onesignal.NotificationOpened.SHARED_PREFS"
+            android:value="DISABLE" />
+
+        <!-- Canal de notificação padrão do Firebase Cloud Messaging -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
 
         <!-- Atividade principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="false"
+            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Meta-data existente -->
+            <!-- Tema normal -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
-            <!-- Intent-filter para inicialização padrão -->
+            <!-- Intent-filter padrão para o launcher do app -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Novo intent-filter para deep linking -->
+            <!-- Intent-filter para deep linking -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Defina o esquema e host do seu link -->
                 <data
                     android:scheme="https"
                     android:host="mindcare-bb0ea3046931.herokuapp.com"
@@ -70,11 +84,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <!-- Meta-data para o Flutter -->
+        <!-- Meta-data para Flutter -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
     </application>
 
     <!-- Seção queries -->
@@ -84,5 +97,4 @@
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
-
 </manifest>

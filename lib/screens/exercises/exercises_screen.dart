@@ -1,110 +1,226 @@
 import 'package:flutter/material.dart';
+import 'package:mindcare_app/services/api_service.dart';
+import 'dart:convert';
+import 'package:mindcare_app/screens/exercises/videoPlayer_screen.dart';
+import 'package:flutter/services.dart';
 
-class ExercisesScreen extends StatelessWidget {
+class ExercisesScreen extends StatefulWidget {
+  @override
+  _ExercisesScreenState createState() => _ExercisesScreenState();
+}
+
+class _ExercisesScreenState extends State<ExercisesScreen> {
+  final ApiService _apiService = ApiService(); // Instância do serviço de API
+  List<dynamic> _videos = []; // Lista completa de vídeos
+  List<dynamic> _filteredVideos =
+      []; // Lista para armazenar os vídeos filtrados
+  String _selectedCategory = ''; // Categoria selecionada para filtragem
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchVideos(); // Carregar vídeos ao iniciar
+  }
+
+  Future<void> _fetchVideos() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await _apiService.getApprovedVideos();
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        setState(() {
+          _videos = data['data']; // Armazena todos os vídeos
+          _filteredVideos = _videos; // Inicialmente, exibe todos os vídeos
+        });
+      } else {
+        throw Exception('Erro ao buscar vídeos: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Erro: ${e.toString()}");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Erro ao carregar vídeos.")));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Função para filtrar vídeos pela categoria selecionada
+  void _filterVideosByCategory(String category) {
+    setState(() {
+      _selectedCategory = category;
+      if (category.isEmpty) {
+        _filteredVideos = _videos; // Exibe todos os vídeos se não houver filtro
+      } else {
+        _filteredVideos = _videos
+            .where((video) => video['category'] == category)
+            .toList(); // Filtra os vídeos por categoria
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercícios de Relaxamento'),
-        backgroundColor: Colors.lightBlue.shade700,
+        title: Text('Exercícios de Meditação'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
+        titleTextStyle: TextStyle(
+            color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Escolha um exercício:',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: exercises.length, // Lista fictícia de exercícios
-                itemBuilder: (context, index) {
-                  final exercise = exercises[index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: ListTile(
-                      leading: Icon(Icons.self_improvement,
-                          size: 40, color: Colors.blueAccent),
-                      title: Text(exercise['title']!),
-                      subtitle: Text(exercise['description']!),
-                      trailing:
-                          Icon(Icons.play_arrow, color: Colors.blueAccent),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ExerciseDetailScreen(exercise: exercise)),
-                        );
-                      },
-                    ),
-                  );
-                },
+      backgroundColor: Colors.grey[100],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCategoryFilter(),
+          Expanded(
+            child: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(color: Colors.blueAccent))
+                : _filteredVideos.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: _filteredVideos.length,
+                        itemBuilder: (context, index) {
+                          return _buildVideoCard(
+                            context,
+                            _filteredVideos[index]['title'],
+                            _filteredVideos[index]['description'],
+                            _filteredVideos[index]['thumbnail'],
+                            _filteredVideos[index]['category'],
+                            _filteredVideos[index]
+                                ['url'], // Passa a URL do vídeo
+                          );
+                        },
+                      )
+                    : Center(child: Text("Nenhum vídeo encontrado")),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget para exibir as opções de categoria
+  Widget _buildCategoryFilter() {
+    final categories = ['Todos', 'Meditação', 'Relaxamento', 'Saúde'];
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: categories.map((category) {
+            return GestureDetector(
+              onTap: () {
+                _filterVideosByCategory(category == 'Todos' ? '' : category);
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _selectedCategory == category
+                      ? Colors.blueAccent
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    color: _selectedCategory == category
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ),
     );
   }
 
-  // Exemplo de lista fictícia de exercícios
-  final List<Map<String, String>> exercises = [
-    {
-      'title': 'Meditação Guiada - Respiração Profunda',
-      'description': 'Encontre calma com esta meditação guiada...',
-    },
-    {
-      'title': 'Exercício de Relaxamento - Mente Sã',
-      'description': 'Uma prática de relaxamento mental e físico...',
-    },
-    {
-      'title': 'Meditação para Dormir Melhor',
-      'description': 'Uma sessão para ajudar você a ter uma noite tranquila...',
-    },
-  ];
-}
-
-// Tela de detalhe do exercício
-class ExerciseDetailScreen extends StatelessWidget {
-  final Map<String, String> exercise;
-
-  const ExerciseDetailScreen({Key? key, required this.exercise})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(exercise['title']!),
-        backgroundColor: Colors.lightBlue.shade700,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+ // Widget para construir cada card de vídeo
+  Widget _buildVideoCard(BuildContext context, String title, String description,
+      String thumbnailUrl, String category, String videoUrl) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: InkWell(
+        onTap: () {
+          // Usar Navigator.push normalmente para empilhar a tela de vídeo sobre a de Meditação
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VideoPlayerScreen(videoUrl: videoUrl),
+            ),
+          ).then((_) {
+            // Redefine a orientação para retrato ao retornar
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+            ]);
+          });
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              exercise['title']!,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Text(
-              exercise['description']!,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            // SINAL DE ATENÇÃO: Aqui integramos o player de vídeo com YouTube ou outra API
-            Container(
-              height: 250,
-              color: Colors.grey[300],
-              child: Center(
-                child: Text('Aqui vai o vídeo do exercício...'),
+            // Thumbnail do vídeo
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                thumbnailUrl,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Icon(Icons.broken_image, size: 100),
               ),
             ),
+            SizedBox(height: 8),
+            // Informações do vídeo (Título e categoria)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    category,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blueAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[800],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Divider(color: Colors.grey[300]),
           ],
         ),
       ),

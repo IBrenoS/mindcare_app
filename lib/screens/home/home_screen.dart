@@ -5,6 +5,7 @@ import 'package:mindcare_app/screens/exercises/exercises_screen.dart';
 import 'package:mindcare_app/screens/map/map_screen.dart';
 import 'package:mindcare_app/screens/diary/diarioHumor_screen.dart';
 import 'package:mindcare_app/screens/profile/profile_screen.dart';
+import 'package:mindcare_app/screens/content/content_screen.dart'; // Importar a tela de conteúdo educativo
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Lista de páginas para exibição dentro do IndexedStack
   final List<Widget> _pages = [
-    Container(color: Colors.white), // Tela Home vazia por enquanto
+    EducationalContentScreen(), // Conteúdo educativo como nova Home
     ExercisesScreen(), // Tela de meditação ou exercícios
     MapScreen(), // Tela do mapa substituindo gamificação
     DiarioHumorScreen(), // Tela de diário
@@ -41,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: theme.primaryColor, // Usa a cor primária do tema
         title: Text(
-          'Olá, [Nome]!',
+          'Olá, [Nome]!', // Bem-vindo com nome do usuário
           style: theme.textTheme.bodyLarge!
               .copyWith(fontSize: 18.sp), // Aplica o tema ao texto
         ),

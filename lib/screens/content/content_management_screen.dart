@@ -49,7 +49,6 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   }
 
   void _showAccessDenied() {
-    // Exibe uma mensagem e retorna à tela anterior
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(
@@ -58,17 +57,30 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
     Navigator.pop(context);
   }
 
+  int currentPage = 1;
+  int itemsPerPage = 100;
+
   Future<void> _loadContent() async {
     setState(() {
       isLoading = true;
     });
     try {
-      final videosResponse = await apiService.getPendingVideos();
-      final articlesResponse = await apiService.getPendingArticles();
+      // Modifique as requisições para incluir paginação
+      final videosResponse = await apiService.getPendingVideos(
+          page: currentPage, limit: itemsPerPage);
+      final articlesResponse = await apiService.getPendingArticles(
+          page: currentPage, limit: itemsPerPage);
 
       setState(() {
-        pendingVideos = _parseResponse(videosResponse);
-        pendingArticles = _parseResponse(articlesResponse);
+        if (currentPage == 1) {
+          // Primeira página: substitui as listas
+          pendingVideos = _parseResponse(videosResponse);
+          pendingArticles = _parseResponse(articlesResponse);
+        } else {
+          // Páginas adicionais: adiciona novos itens
+          pendingVideos.addAll(_parseResponse(videosResponse));
+          pendingArticles.addAll(_parseResponse(articlesResponse));
+        }
         isLoading = false;
       });
     } catch (e) {
@@ -78,6 +90,15 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       _showError('Erro ao carregar conteúdos pendentes.');
     }
   }
+
+// Função para carregar a próxima página
+  void _loadNextPage() {
+    setState(() {
+      currentPage++;
+    });
+    _loadContent();
+  }
+
 
   List<dynamic> _parseResponse(dynamic response) {
     if (response.statusCode == 200 && response.body.isNotEmpty) {
@@ -159,9 +180,9 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   }
 
   Widget _buildVideoCard(dynamic video) {
-    final thumbnailUrl = video['thumbnailUrl'] ?? '';
+    final thumbnailUrl = video['thumbnail'] ?? '';
     final title = video['title'] ?? 'Sem título';
-    final channelTitle = video['channelTitle'] ?? 'Autor desconhecido';
+    final channelTitle = video['channelName'] ?? 'Autor desconhecido';
 
     return Card(
       margin: EdgeInsets.all(8.0),
@@ -202,10 +223,24 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   Widget _buildArticleCard(dynamic article) {
     final title = article['title'] ?? 'Sem título';
     final author = article['author'] ?? 'Autor desconhecido';
+    final thumbnailUrl = article['urlToImage'] ?? '';
 
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
+        leading: thumbnailUrl.isNotEmpty
+            ? Image.network(
+                thumbnailUrl,
+                width: 100,
+                height: 56,
+                fit: BoxFit.cover,
+              )
+            : Container(
+                width: 100,
+                height: 56,
+                color: Colors.grey,
+                child: Icon(Icons.article, color: Colors.white),
+              ),
         title: Text(title),
         subtitle: Text('Autor: $author'),
         trailing: _buildActionButtons(article, false),
@@ -213,7 +248,6 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       ),
     );
   }
-
 
   Widget _buildActionButtons(dynamic item, bool isVideo) {
     return Row(
@@ -257,19 +291,33 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
     });
     try {
       if (isVideo) {
-        // Solicita a categoria antes de aprovar
         String? category = await _selectCategory();
         if (category != null) {
-          await apiService.approveVideo(contentId, category);
-          _showSuccess('Vídeo aprovado com sucesso.');
+          final response = await apiService
+              .approveVideo(contentId, category)
+              .timeout(Duration(seconds: 10));
+
+          if (response.statusCode == 200) {
+            _showSuccess('Vídeo aprovado com sucesso.');
+          } else {
+            throw Exception('Falha ao aprovar o vídeo.');
+          }
         }
       } else {
-        await apiService.approveArticle(contentId);
-        _showSuccess('Artigo aprovado com sucesso.');
+        final response = await apiService
+            .approveArticle(contentId)
+            .timeout(Duration(seconds: 10));
+
+        if (response.statusCode == 200) {
+          _showSuccess('Artigo aprovado com sucesso.');
+        } else {
+          throw Exception('Falha ao aprovar o artigo.');
+        }
       }
       await _loadContent();
     } catch (e) {
-      _showError('Erro ao aprovar conteúdo.');
+      _showError('Erro ao aprovar conteúdo: ${e.toString()}');
+    } finally {
       setState(() {
         isLoading = false;
       });
@@ -281,16 +329,25 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       isLoading = true;
     });
     try {
-      if (isVideo) {
-        await apiService.rejectVideo(contentId);
-        _showSuccess('Vídeo rejeitado com sucesso.');
+      final response = isVideo
+          ? await apiService
+              .rejectVideo(contentId)
+              .timeout(Duration(seconds: 10))
+          : await apiService
+              .rejectArticle(contentId)
+              .timeout(Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        _showSuccess(isVideo
+            ? 'Vídeo rejeitado com sucesso.'
+            : 'Artigo rejeitado com sucesso.');
+        await _loadContent();
       } else {
-        await apiService.rejectArticle(contentId);
-        _showSuccess('Artigo rejeitado com sucesso.');
+        throw Exception('Falha ao rejeitar conteúdo.');
       }
-      await _loadContent();
     } catch (e) {
-      _showError('Erro ao rejeitar conteúdo.');
+      _showError('Erro ao rejeitar conteúdo: ${e.toString()}');
+    } finally {
       setState(() {
         isLoading = false;
       });
@@ -298,7 +355,6 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   }
 
   Future<String?> _selectCategory() async {
-    // Exibe um dialog para selecionar a categoria
     String? selectedCategory;
     await showDialog<String>(
       context: context,
@@ -307,7 +363,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
         return AlertDialog(
           title: Text('Selecione a Categoria'),
           content: DropdownButtonFormField<String>(
-            items: ['Meditação', 'Relaxamento', 'Yoga']
+            items: ['Meditação', 'Relaxamento', 'Saúde']
                 .map((category) => DropdownMenuItem(
                       value: category,
                       child: Text(category),
