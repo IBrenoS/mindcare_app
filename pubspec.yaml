@@ -3,12 +3,10 @@ description: "A new Flutter project."
 
 publish_to: "none"
 
-
 version: 1.0.0+1
 
 environment:
   sdk: ^3.5.1
-
 
 dependencies:
   flutter:
@@ -33,7 +31,6 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # Notificações e mensagens push
-  onesignal_flutter: ^5.2.6
 
   # Funcionalidades de segurança e armazenamento local
   flutter_secure_storage: ^9.2.2
@@ -65,19 +62,16 @@ dependencies:
   # Configurações de ambiente e variáveis de ambiente
   flutter_dotenv: ^5.2.1
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
+  # Análise e linting
   flutter_lints: ^4.0.0
 
 
 flutter:
-
   uses-material-design: true
-
 
   assets:
     - assets/images/logo.png
