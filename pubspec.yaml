@@ -31,6 +31,7 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # Notificações e mensagens push
+  
 
   # Funcionalidades de segurança e armazenamento local
   flutter_secure_storage: ^9.2.2

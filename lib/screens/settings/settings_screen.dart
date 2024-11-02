@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindcare_app/screens/theme/theme_provider.dart';
 import 'package:mindcare_app/screens/login/login_screen.dart';
+import 'package:mindcare_app/screens/help/help_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -25,15 +26,15 @@ class _SettingsScreenState extends State<SettingsScreen>
     // Inicializa o AnimationController para controlar a animação de fade
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
-      vsync: this, // vsync agora funciona com múltiplos tickers
+      vsync: this,
     );
 
-    // Define a animação de fade de 1 (totalmente opaco) para 0 (totalmente transparente)
+    // Define a animação de fade de 1 (opaco) para 0 (transparente)
     _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
-    // Adiciona um listener para a animação para navegar após o fade
+    // Listener para navegação após o fade
     _fadeAnimation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _performLogout(context);
@@ -47,13 +48,11 @@ class _SettingsScreenState extends State<SettingsScreen>
     super.dispose();
   }
 
-  // Função que lida com o logout e redireciona para a tela de login
   Future<void> _performLogout(BuildContext context) async {
     try {
-      // Remove o token do armazenamento seguro
+      // Remove o token de autenticação
       await _secureStorage.delete(key: 'authToken');
 
-      // Exibe uma mensagem de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Você saiu da sua conta com sucesso.'),
@@ -61,13 +60,12 @@ class _SettingsScreenState extends State<SettingsScreen>
         ),
       );
 
-      // Redireciona o usuário para a tela de login
+      // Redireciona para a tela de login
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
         (Route<dynamic> route) => false,
       );
     } catch (e) {
-      // Exibe uma mensagem de erro em caso de falha
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Erro ao sair da conta. Tente novamente.'),
@@ -77,12 +75,11 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
   }
 
-  // Função para iniciar a animação de fade ao realizar o logout
   void _logoutWithAnimation() {
     setState(() {
       _isLoggingOut = true;
     });
-    _controller.forward(); // Inicia a animação de fade
+    _controller.forward();
   }
 
   @override
@@ -119,11 +116,26 @@ class _SettingsScreenState extends State<SettingsScreen>
                 ],
               ),
               const Divider(),
+
+              // Opção para o botão de Suporte ao Usuário
+              ListTile(
+                title: const Text('Suporte ao Usuário'),
+                leading:
+                    const Icon(Icons.help_outline, color: Colors.blueAccent),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HelpScreen()),
+                  );
+                },
+              ),
+              const Divider(),
+
+              // Opção de Sair da Conta com animação
               ListTile(
                 title: const Text('Sair da Conta'),
                 leading: const Icon(Icons.logout, color: Colors.redAccent),
                 onTap: () {
-                  // Confirmação antes de sair
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -138,8 +150,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Fecha o diálogo
-                              _logoutWithAnimation(); // Inicia o logout com animação
+                              Navigator.of(context).pop();
+                              _logoutWithAnimation();
                             },
                             child: const Text(
                               'Sair',
