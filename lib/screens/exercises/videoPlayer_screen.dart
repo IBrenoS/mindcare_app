@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/services.dart'; // Para controle de orientação de tela
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -98,10 +99,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 Expanded(child: player),
                 if (!_isFullScreen)
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0.w), // Responsive padding
                     child: Text(
                       'Descrição do vídeo ou outros detalhes podem ser exibidos aqui.',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(
+                        fontSize: 14.sp, // Responsive font size
+                        color: Colors.grey[700],
+                      ),
                     ),
                   ),
               ],

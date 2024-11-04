@@ -148,13 +148,13 @@ class _LoginScreenState extends State<LoginScreen>
           Theme.of(context).scaffoldBackgroundColor, // Adaptação ao tema
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16.w), // Use ScreenUtil for padding
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _buildLogo(),
-                SizedBox(height: 20.h),
+                SizedBox(height: 20.h), // Responsive spacing
                 _buildForm(),
               ],
             ),
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildLogo() {
     return Image.asset(
       'assets/images/logo.png',
-      height: 250.h,
+      height: 250.h, // Adjusted for responsiveness
     );
   }
 
@@ -280,15 +280,18 @@ class _LoginScreenState extends State<LoginScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: bottomColor,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.r),
+                borderRadius: BorderRadius.circular(25.r), // Responsive radius
               ),
-              padding: EdgeInsets.symmetric(horizontal: 55.w, vertical: 15.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 55.w, // Responsive horizontal padding
+                vertical: 15.h,   // Responsive vertical padding
+              ),
             ),
             child: Text(
               'Login',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18.sp,
+                fontSize: 18.sp, // Responsive font size
               ),
             ),
           );

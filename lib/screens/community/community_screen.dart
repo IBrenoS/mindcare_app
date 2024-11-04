@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:mindcare_app/services/api_service.dart';
 import 'package:mindcare_app/utils/time_formatter.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CommunityScreen extends StatefulWidget {
   @override
@@ -322,22 +323,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 20,
-            left: 20,
-            right: 20,
+            top: 20.h,
+            left: 20.w,
+            right: 20.w,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_selectedImage != null)
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r),
                   child: AspectRatio(
                     aspectRatio:
                         1, // Define uma proporção consistente para o feed
@@ -345,11 +346,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       _selectedImage!,
                       fit: BoxFit.cover, // Ajusta a imagem para cobrir a área
                       width: double.infinity,
-                      height: 200,
+                      height: 200.h,
                     ),
                   ),
                 ),
-              SizedBox(height: 10),
+              SizedBox(height: 10.h),
               TextField(
                 controller: _captionController,
                 decoration: InputDecoration(
@@ -357,10 +358,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 10.h),
               ElevatedButton(
                 onPressed: _createPost,
-                child: Text('Compartilhar'),
+                child: Text(
+                  'Compartilhar',
+                  style: TextStyle(fontSize: 16.sp),
+                ),
               ),
             ],
           ),
@@ -398,7 +402,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Comunidade'),
+        title: Text(
+          'Comunidade',
+          style: TextStyle(fontSize: 20.sp),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -434,34 +441,42 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         leading: CircleAvatar(
                           backgroundImage:
                               NetworkImage(post["userId"]["photoUrl"] ?? ''),
+                          radius: 24.r,
                         ),
-                        title: Text(post["userId"]["name"] ?? 'Usuário'),
+                        title: Text(
+                          post["userId"]["name"] ?? 'Usuário',
+                          style: TextStyle(fontSize: 16.sp),
+                        ),
                         subtitle: Text(
                           formatarTempoEmPortugues(
                             DateTime.parse(post["createdAt"]),
                           ),
+                          style: TextStyle(fontSize: 14.sp),
                         ),
                       ),
                       if (post["imageUrl"] != null)
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8.r),
                           child: AspectRatio(
                             aspectRatio: 1,
                             child: Image.network(
                               post["imageUrl"],
                               fit: BoxFit.cover,
                               width: double.infinity,
-                              height: 200,
+                              height: 200.h,
                             ),
                           ),
                         ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        child: Text(post["content"] ?? ''),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.w, vertical: 8.h),
+                        child: Text(
+                          post["content"] ?? '',
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: Row(
                           children: [
                             Row(
@@ -470,23 +485,32 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                   icon: Icon(
                                     Icons.favorite,
                                     color: isLiked ? Colors.pink : Colors.grey,
+                                    size: 24.sp,
                                   ),
                                   onPressed: () {
                                     toggleLikePost(post['_id'], isLiked);
                                   },
                                 ),
-                                Text('${post["likes"]?.length ?? 0}'),
+                                Text(
+                                  '${post["likes"]?.length ?? 0}',
+                                  style: TextStyle(fontSize: 14.sp),
+                                ),
                               ],
                             ),
                             IconButton(
-                              icon: Icon(Icons.mode_comment_outlined),
+                              icon: Icon(
+                                Icons.mode_comment_outlined,
+                                size: 24.sp,
+                              ),
                               onPressed: () {
                                 _showCommentsModal(
                                     context, post["comments"], post["_id"]);
                               },
                             ),
                             Text(
-                                '${post["comments"]?.length ?? 0} comentários'),
+                              '${post["comments"]?.length ?? 0} comentários',
+                              style: TextStyle(fontSize: 14.sp),
+                            ),
                           ],
                         ),
                       ),

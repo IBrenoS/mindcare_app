@@ -3,6 +3,7 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'dart:convert';
 import 'package:mindcare_app/screens/exercises/videoPlayer_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ExercisesScreen extends StatefulWidget {
   @override
@@ -69,7 +70,13 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercícios de Meditação'),
+        title: Text(
+          'Exercícios de Meditação',
+          style: TextStyle(
+            fontSize: 20.sp, // Responsive font size
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
@@ -111,7 +118,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _buildCategoryFilter() {
     final categories = ['Todos', 'Meditação', 'Relaxamento', 'Saúde'];
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.symmetric(vertical: 10.0.h), // Responsive padding
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -121,8 +128,8 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 _filterVideosByCategory(category == 'Todos' ? '' : category);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.0),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                margin: EdgeInsets.symmetric(horizontal: 8.0.w), // Responsive margin
+                padding: EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 8.0.h), // Responsive padding
                 decoration: BoxDecoration(
                   color: _selectedCategory == category
                       ? Colors.blueAccent
@@ -151,7 +158,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _buildVideoCard(BuildContext context, String title, String description,
       String thumbnailUrl, String category, String videoUrl) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 16.0.w), // Responsive padding
       child: InkWell(
         onTap: () {
           // Usar Navigator.push normalmente para empilhar a tela de vídeo sobre a de Meditação
@@ -172,46 +179,46 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           children: [
             // Thumbnail do vídeo
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8.r), // Responsive border radius
               child: Image.network(
                 thumbnailUrl,
                 width: double.infinity,
-                height: 200,
+                height: 200.h, // Responsive height
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                     Icon(Icons.broken_image, size: 100),
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 8.h), // Responsive spacing
             // Informações do vídeo (Título e categoria)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0.w), // Responsive padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp, // Responsive font size
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 4.h), // Responsive spacing
                   Text(
                     category,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 14.sp, // Responsive font size
                       color: Colors.blueAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 4.h), // Responsive spacing
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 14.sp, // Responsive font size
                       color: Colors.grey[800],
                     ),
                     maxLines: 1,

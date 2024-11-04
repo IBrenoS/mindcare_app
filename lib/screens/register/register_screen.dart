@@ -124,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16.w), // Use ScreenUtil for padding
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 350.w,
+                    width: 350.w, // Adjusted width for responsiveness
                     child: Column(
                       children: [
                         _buildTextField(
@@ -145,7 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16.h), // Responsive spacing
                         _buildTextField(
                           controller: _emailController,
                           labelText: 'E-mail',
@@ -161,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16.h), // Responsive spacing
                         _buildTextField(
                           controller: _phoneController,
                           labelText: 'Telefone',
@@ -176,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16.h), // Responsive spacing
                         _buildPasswordField(
                           controller: _passwordController,
                           labelText: 'Senha',
@@ -187,7 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             });
                           },
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16.h), // Responsive spacing
                         _buildPasswordField(
                           controller: _confirmPasswordController,
                           labelText: 'Confirmação de Senha',
@@ -205,9 +205,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 24.h),
+                        SizedBox(height: 24.h), // Responsive spacing
                         _buildRegisterButton(),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 16.h), // Responsive spacing
                         _buildLoginLink(),
                       ],
                     ),
@@ -299,22 +299,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return _isLoading
         ? const CircularProgressIndicator()
         : SizedBox(
-            width: 210.w,
+            width: 210.w, // Adjusted for responsiveness
             height: 50.h,
             child: ElevatedButton(
               onPressed: _register,
               style: ElevatedButton.styleFrom(
                 backgroundColor: bottomColor,
-                padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 15.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 50.w, // Responsive horizontal padding
+                  vertical: 15.h,   // Responsive vertical padding
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.r),
+                  borderRadius: BorderRadius.circular(15.r), // Responsive radius
                 ),
               ),
               child: Text(
                 'Criar Conta',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: 18.sp,
+                  fontSize: 18.sp, // Responsive font size
                 ),
               ),
             ),

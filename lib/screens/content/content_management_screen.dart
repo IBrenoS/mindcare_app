@@ -3,6 +3,7 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'package:mindcare_app/screens/functions/article_preview_screen.dart';
 import 'package:mindcare_app/screens/functions/video_preview_screen.dart';
 import 'dart:convert';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContentManagementScreen extends StatefulWidget {
   @override
@@ -185,23 +186,23 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
     final channelTitle = video['channelName'] ?? 'Autor desconhecido';
 
     return Card(
-      margin: EdgeInsets.all(8.0),
+      margin: EdgeInsets.all(8.w),
       child: ListTile(
         leading: thumbnailUrl.isNotEmpty
             ? Image.network(
                 thumbnailUrl,
-                width: 100,
-                height: 56,
+                width: 100.w,
+                height: 56.h,
                 fit: BoxFit.cover,
               )
             : Container(
-                width: 100,
-                height: 56,
+                width: 100.w,
+                height: 56.h,
                 color: Colors.grey,
                 child: Icon(Icons.image, color: Colors.white),
               ),
-        title: Text(title),
-        subtitle: Text('Autor: $channelTitle'),
+        title: Text(title, style: TextStyle(fontSize: 16.sp)),
+        subtitle: Text('Autor: $channelTitle', style: TextStyle(fontSize: 14.sp)),
         trailing: _buildActionButtons(video, true),
         onTap: () => _viewVideo(video),
       ),
@@ -226,23 +227,23 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
     final thumbnailUrl = article['urlToImage'] ?? '';
 
     return Card(
-      margin: EdgeInsets.all(8.0),
+      margin: EdgeInsets.all(8.w),
       child: ListTile(
         leading: thumbnailUrl.isNotEmpty
             ? Image.network(
                 thumbnailUrl,
-                width: 100,
-                height: 56,
+                width: 100.w,
+                height: 56.h,
                 fit: BoxFit.cover,
               )
             : Container(
-                width: 100,
-                height: 56,
+                width: 100.w,
+                height: 56.h,
                 color: Colors.grey,
                 child: Icon(Icons.article, color: Colors.white),
               ),
-        title: Text(title),
-        subtitle: Text('Autor: $author'),
+        title: Text(title, style: TextStyle(fontSize: 16.sp)),
+        subtitle: Text('Autor: $author', style: TextStyle(fontSize: 14.sp)),
         trailing: _buildActionButtons(article, false),
         onTap: () => _viewArticle(article),
       ),

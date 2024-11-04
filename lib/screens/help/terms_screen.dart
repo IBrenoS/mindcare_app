@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
 
 class TermsScreen extends StatelessWidget {
   final String termsText = '''
@@ -18,10 +19,10 @@ class TermsScreen extends StatelessWidget {
         title: const Text('Termos de Uso e Privacidade'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.r), // Adjust padding
         child: Text(
           termsText,
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16.sp), // Adjust text size
         ),
       ),
     );

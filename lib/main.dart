@@ -48,6 +48,11 @@ class MyApp extends StatelessWidget {
                 darkTheme: darkTheme,
                 themeMode: themeProvider.themeMode,
                 home: const AuthCheck(),
+                builder: (context, widget) {
+                  // Ensure ScreenUtil is initialized in all routes
+                  ScreenUtil.init(context);
+                  return widget!;
+                },
                 routes: {
                   '/login': (context) => const LoginScreen(),
                   '/register': (context) => const RegisterScreen(),

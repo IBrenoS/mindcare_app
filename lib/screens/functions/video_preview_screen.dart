@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoPreviewScreen extends StatefulWidget {
   final dynamic video;
@@ -53,19 +54,20 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                   showVideoProgressIndicator: true,
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16.0.w), // Responsive padding using ScreenUtil
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.video['description'] ?? 'Sem descrição.',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16.sp), // Responsive font size
                       ),
-                      SizedBox(height: 8.0),
+                      SizedBox(height: 8.0.h), // Responsive height
                       Text(
                         "Canal: ${widget.video['channelName'] ?? 'Autor desconhecido'}",
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                            fontSize: 14.sp, // Responsive font size
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -75,7 +77,10 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
           : Center(
               child: Text(
                 'URL do vídeo inválida.',
-                style: TextStyle(fontSize: 18, color: Colors.red),
+                style: TextStyle(
+                  fontSize: 18.sp, // Responsive font size
+                  color: Colors.red,
+                ),
               ),
             ),
     );

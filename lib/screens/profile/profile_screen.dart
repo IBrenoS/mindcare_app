@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindcare_app/screens/settings/settings_screen.dart';
 import 'package:mindcare_app/screens/content/content_management_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -229,7 +230,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Editar Perfil' : 'Perfil do Usuário'),
+        // Adjust font size using ScreenUtil
+        title: Text(
+          isEditing ? 'Editar Perfil' : 'Perfil do Usuário',
+          style: TextStyle(fontSize: 18.sp),
+        ),
         actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.menu),
@@ -266,14 +271,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            // Adjust padding using ScreenUtil
+            padding: EdgeInsets.all(16.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
                   onTap: isEditing ? pickAndCropImage : null,
                   child: CircleAvatar(
-                    radius: 50,
+                    // Adjust radius using ScreenUtil
+                    radius: 50.r,
                     backgroundImage: _selectedImage != null
                         ? FileImage(_selectedImage!)
                         : (profileImageUrl != null
@@ -283,34 +290,39 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             as ImageProvider,
                   ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 16.h), // Adjust height using ScreenUtil
                 if (!isEditing)
                   Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Adjust font size using ScreenUtil
                           Text(
                             nameController.text,
                             style: TextStyle(
-                              fontSize: 24,
+                              fontSize: 24.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 8.w), // Adjust width using ScreenUtil
                           if (userRole == 'moderator')
                             _buildBadge('Moderador', Colors.red),
                           if (userRole == 'admin')
                             _buildBadge('Administrador', Colors.amber),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 8.h), // Adjust height using ScreenUtil
+                      // Adjust font size using ScreenUtil
                       Text(
                         bioController.text,
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.grey[700],
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       if (userRole == 'moderator' || userRole == 'admin')
                         ElevatedButton(
                           onPressed: () {
@@ -350,7 +362,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         label: 'Nova Senha',
                         obscureText: true,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 20.h), // Adjust height using ScreenUtil
                       ElevatedButton(
                         onPressed: saveProfile,
                         child: Text('Salvar Alterações'),
@@ -382,13 +394,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     bool obscureText = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      // Adjust vertical padding using ScreenUtil
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          // Adjust border radius using ScreenUtil
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
         ),
       ),
     );
@@ -396,14 +412,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Widget _buildBadge(String text, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      // Adjust padding using ScreenUtil
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
         text,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 14.sp, // Adjust font size using ScreenUtil
+        ),
       ),
     );
   }

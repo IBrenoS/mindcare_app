@@ -170,23 +170,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // Adjust font size using ScreenUtil
         title: Text('Redefinir Senha', style: TextStyle(fontSize: 18.sp)),
         backgroundColor: Colors.lightBlue.shade700,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16.w), // Adjust padding using ScreenUtil
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 50.h),
+                SizedBox(height: 50.h), // Adjust height using ScreenUtil
+                // Adjust font size using ScreenUtil
                 Text(
                   'Digite sua nova senha para redefinir.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16.sp),
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 20.h), // Adjust height using ScreenUtil
 
                 // Campo de Nova Senha
                 TextFormField(
@@ -196,7 +198,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   decoration: InputDecoration(
                     labelText: 'Nova Senha',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(10.r), // Adjust radius
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -233,7 +235,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 20.h), // Adjust height using ScreenUtil
 
                 // Campo de Confirmação de Nova Senha
                 TextFormField(
@@ -243,7 +245,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   decoration: InputDecoration(
                     labelText: 'Confirme a Nova Senha',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(10.r), // Adjust radius
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -268,23 +270,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 20.h), // Adjust height using ScreenUtil
 
                 // Botão para redefinir senha
                 ElevatedButton(
                   onPressed: _isLoading ? null : _resetPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightBlue.shade700,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 50.w, vertical: 15.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 50.w,
+                      vertical: 15.h,
+                    ), // Adjust padding using ScreenUtil
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Colors.white))
                       : Text('Redefinir Senha',
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 18.sp)),
+                          style: TextStyle(
+                              color: Colors.white, fontSize: 18.sp)), // Adjust font size
                 ),
               ],
             ),

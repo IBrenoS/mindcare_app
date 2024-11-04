@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ArticlePreviewScreen extends StatefulWidget {
   final dynamic article;
@@ -43,26 +44,27 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 20.sp), // Responsive font size
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.w), // Responsive padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Imagem do artigo
             if (imageUrl.isNotEmpty)
               Container(
-                margin: EdgeInsets.only(bottom: 16.0),
+                margin: EdgeInsets.only(bottom: 16.0.h), // Responsive margin
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: 200,
+                  height: 200.h, // Responsive height
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[200],
-                      height: 200,
+                      height: 200.h, // Responsive height
                       child: Center(
                         child: Icon(Icons.broken_image,
                             size: 50, color: Colors.grey),
@@ -75,35 +77,35 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
             Text(
               title,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 24.sp, // Responsive font size
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8.0),
+            SizedBox(height: 8.0.h), // Responsive spacing
             // Autor do artigo
             Text(
               'Autor: $author',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 16.sp, // Responsive font size
                 color: Colors.grey[700],
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 16.0.h), // Responsive spacing
             // Conteúdo do artigo com opção de expandir
             Text(
               _isExpanded ? content : '${content.substring(0, 200)}...',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 16.sp, // Responsive font size
                 height: 1.5,
               ),
             ),
-            SizedBox(height: 8.0),
+            SizedBox(height: 8.0.h), // Responsive spacing
             // Botão de "Leia Mais" para expandir o conteúdo completo
             TextButton(
               onPressed: _toggleReadMore,
               child: Text(_isExpanded ? "Mostrar menos" : "Leia mais"),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 16.0.h), // Responsive spacing
             // Botão para abrir o artigo na web, se a URL estiver disponível
             if (articleUrl.isNotEmpty)
               Center(
@@ -112,7 +114,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
                   icon: Icon(Icons.open_in_browser),
                   label: Text("Abrir Artigo Original"),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h), // Responsive padding
                   ),
                 ),
               ),

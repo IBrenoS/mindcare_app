@@ -98,28 +98,30 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // Adjust font size using ScreenUtil
         title: Text('Verificar Código', style: TextStyle(fontSize: 18.sp)),
         backgroundColor: Colors.lightBlue.shade700,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16.w), // Adjust padding using ScreenUtil
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Adjust font size using ScreenUtil
               Text(
                 'Insira o código enviado para o e-mail ${receivedEmail.isNotEmpty ? receivedEmail : "não informado"}.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 20.h), // Adjust height using ScreenUtil
               TextFormField(
                 controller: _codeController,
                 decoration: InputDecoration(
                   labelText: 'Código de Verificação',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: BorderRadius.circular(10.r), // Adjust radius
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -133,7 +135,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 20.h), // Adjust height using ScreenUtil
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(

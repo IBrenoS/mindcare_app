@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
 
 class FAQScreen extends StatelessWidget {
   final List<Map<String, String>> faqItems = [
@@ -25,11 +26,17 @@ class FAQScreen extends StatelessWidget {
         itemCount: faqItems.length,
         itemBuilder: (context, index) {
           return ExpansionTile(
-            title: Text(faqItems[index]['question']!),
+            title: Text(
+              faqItems[index]['question']!,
+              style: TextStyle(fontSize: 16.sp), // Adjust text size
+            ),
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(faqItems[index]['answer']!),
+                padding: EdgeInsets.all(16.0.r), // Adjust padding
+                child: Text(
+                  faqItems[index]['answer']!,
+                  style: TextStyle(fontSize: 14.sp), // Adjust text size
+                ),
               ),
             ],
           );

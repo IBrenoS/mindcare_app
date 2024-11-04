@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
 
 class SupportScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -21,7 +22,7 @@ class SupportScreen extends StatelessWidget {
         title: const Text('Suporte e Contato'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.r), // Adjust padding
         child: Form(
           key: _formKey,
           child: Column(
@@ -48,10 +49,13 @@ class SupportScreen extends StatelessWidget {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h), // Adjust spacing
               ElevatedButton(
                 onPressed: () => _submitForm(context),
-                child: const Text('Enviar'),
+                child: Text(
+                  'Enviar',
+                  style: TextStyle(fontSize: 16.sp), // Adjust button text size
+                ),
               ),
             ],
           ),

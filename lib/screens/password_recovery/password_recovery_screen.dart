@@ -122,8 +122,10 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Set background color using Theme
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        // Adjust font size using ScreenUtil
         title: Text(
           'Recuperação de Senha',
           style: TextStyle(
@@ -139,12 +141,13 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(16.w), // Adjust padding using ScreenUtil
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Adjust font size using ScreenUtil
               Text(
                 'Insira seu e-mail cadastrado para recuperar sua senha.',
                 textAlign: TextAlign.center,
@@ -153,7 +156,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 24.h), // Adjust height using ScreenUtil
               TextFormField(
                 controller: _emailController,
                 style:
@@ -164,10 +167,12 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                       TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   fillColor: Theme.of(context).colorScheme.surface,
                   filled: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 16.w,
+                  ), // Adjust padding using ScreenUtil
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: BorderRadius.circular(10.r), // Adjust radius
                     borderSide:
                         BorderSide(color: Theme.of(context).dividerColor),
                   ),
@@ -183,7 +188,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 24.h), // Adjust height using ScreenUtil
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
@@ -195,8 +200,8 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                         padding: EdgeInsets.symmetric(
                           horizontal: 50.w,
                           vertical: 15.h,
-                        ),
-                        textStyle: TextStyle(fontSize: 18.sp),
+                        ), // Adjust padding using ScreenUtil
+                        textStyle: TextStyle(fontSize: 18.sp), // Adjust font size
                       ),
                       child: Text(
                         'Recuperar Senha',

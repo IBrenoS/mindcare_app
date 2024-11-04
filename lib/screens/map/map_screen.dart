@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:mindcare_app/services/api_service.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -216,7 +217,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Widget _buildPhotoCarousel(List photos) {
     return Container(
-      height: 200,
+      height: 200.h, // Adjusted for responsiveness
       child: PageView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: photos.length,
@@ -284,9 +285,9 @@ class _MapScreenState extends State<MapScreen> {
                 ),
           if (_isFilterVisible)
             Positioned(
-              top: 20,
-              left: 20,
-              right: 20,
+              top: 20.h, // Adjusted for responsiveness
+              left: 20.w,
+              right: 20.w,
               child: AnimatedOpacity(
                 opacity: _isFilterVisible ? 1.0 : 0.0,
                 duration: Duration(milliseconds: 300),
@@ -324,11 +325,11 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           Positioned(
-            bottom: 20,
-            right: 20,
+            bottom: 20.h, // Adjusted for responsiveness
+            right: 20.w,
             child: FloatingActionButton(
               onPressed: _centerMap,
-              child: Icon(Icons.my_location),
+              child: Icon(Icons.my_location, size: 24.sp), // Responsive icon size
             ),
           ),
         ],

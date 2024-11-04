@@ -6,6 +6,7 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DiarioHumorScreen extends StatefulWidget {
   @override
@@ -431,7 +432,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0.w), // Responsive padding
             child: Column(
               children: [
                 // Seção de Registro de Emoções
@@ -439,14 +440,17 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Como você está se sentindo?",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18.sp, // Responsive font size
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Scroll horizontal para emojis com botão de adicionar
                 Container(
-                  height: 70,
+                  height: 70.h, // Responsive height
                   child: Row(
                     children: [
                       Expanded(
@@ -488,7 +492,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 20.h), // Responsive spacing
 
                 // Campo de texto para descrever o humor com prompt de reflexão
                 TextField(
@@ -498,12 +502,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     labelText: "Descreva seu humor (opcional)",
                     hintText: "O que aconteceu hoje que influenciou seu humor?",
                     border: OutlineInputBorder(),
+                    labelStyle: TextStyle(fontSize: 16.sp), // Responsive font size
+                    hintStyle: TextStyle(fontSize: 14.sp), // Responsive font size
                   ),
+                  style: TextStyle(fontSize: 14.sp), // Responsive font size
                   onChanged: (text) {
                     _analisarSentimento(text);
                   },
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Exibição de palavras-chave (análise de sentimento simples)
                 _keywords.isNotEmpty
@@ -515,21 +522,21 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                       )
                     : Container(),
 
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Botão "Registrar Humor" com animação
                 Center(
                   child: SizedBox(
-                    width: 200,
+                    width: 200.w, // Responsive width
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _registrarHumor,
                       child: _isLoading
-                          ? SpinKitCircle(color: Colors.white, size: 30)
-                          : Text("Registrar Humor"),
+                          ? SpinKitCircle(color: Colors.white, size: 30.w) // Responsive size
+                          : Text("Registrar Humor", style: TextStyle(fontSize: 16.sp)), // Responsive font size
                     ).animate().scale(),
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 20.h), // Responsive spacing
 
                 // Mensagem de sucesso
                 _isRegistered
@@ -539,7 +546,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                         child: Text(
                           "Humor registrado com sucesso!",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp, // Responsive font size
                             fontWeight: FontWeight.bold,
                             color: Colors.green,
                           ),
@@ -553,17 +560,20 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Histórico de Humor",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18.sp, // Responsive font size
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Adicionar o filtro
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text('Filtrar:'),
-                    SizedBox(width: 10),
+                    SizedBox(width: 10.w), // Responsive spacing
                     DropdownButton<String>(
                       value: _selectedFilter,
                       items: ['Todas', 'Diário', 'Semanal', 'Mensal']
@@ -582,7 +592,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Campo de busca por palavras-chave
                 TextField(
@@ -597,7 +607,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h), // Responsive spacing
 
                 // Histórico de humor com animações
                 displayedEntries.isEmpty
@@ -631,14 +641,14 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 // Botão "Carregar Mais" com animação
                 Center(
                   child: SizedBox(
-                    width: 200,
+                    width: 200.w, // Responsive width
                     child: _isFetchingMore
-                        ? SpinKitCircle(color: Colors.blue, size: 30)
+                        ? SpinKitCircle(color: Colors.blue, size: 30.w) // Responsive size
                         : ElevatedButton(
                             onPressed: () {
                               _carregarHistorico();
                             },
-                            child: Text("Carregar Mais"),
+                            child: Text("Carregar Mais", style: TextStyle(fontSize: 16.sp)), // Responsive font size
                           ).animate().scale(),
                   ),
                 ),

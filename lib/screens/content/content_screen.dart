@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mindcare_app/services/api_service.dart';
 import 'dart:convert';
 import 'package:mindcare_app/screens/content/articleDetail_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EducationalContentScreen extends StatefulWidget {
   @override
@@ -62,7 +63,10 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Conteúdo Educativo"),
+        title: Text(
+          "Conteúdo Educativo",
+          style: TextStyle(fontSize: 20.sp), // Adjust font size responsively
+        ),
       ),
       body: isLoading && articles.isEmpty
           ? Center(child: CircularProgressIndicator())
@@ -72,11 +76,17 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                          "Erro ao carregar artigos ou nenhum artigo disponível."),
-                      SizedBox(height: 10),
+                        "Erro ao carregar artigos ou nenhum artigo disponível.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16.sp),
+                      ),
+                      SizedBox(height: 10.h),
                       ElevatedButton(
                         onPressed: _loadApprovedArticles,
-                        child: Text("Tentar novamente"),
+                        child: Text(
+                          "Tentar novamente",
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
                       ),
                     ],
                   ),
@@ -94,8 +104,8 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                     itemCount: articles.length + (hasMoreArticles ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == articles.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 15),
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 15.h),
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
@@ -103,19 +113,18 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                       final article = articles[index];
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
+                        margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
                         elevation: 2,
                         child: ListTile(
-                          contentPadding: EdgeInsets.all(10),
+                          contentPadding: EdgeInsets.all(10.w),
                           leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(8.r),
                             child: Image.network(
                               article['urlToImage'] ?? '',
-                              width: 60,
-                              height: 60,
+                              width: 60.w,
+                              height: 60.h,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -123,21 +132,25 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                             article['title'] ?? '',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              SizedBox(height: 5.h),
                               Text(
                                 article['summary'] ?? '',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 14.sp),
                               ),
-                              SizedBox(height: 5),
+                              SizedBox(height: 5.h),
                               Text(
                                 "Por ${article['author'] ?? 'Desconhecido'} - ${article['source'] ?? ''}",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                               ),
                             ],
                           ),

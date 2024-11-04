@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindcare_app/screens/theme/theme_provider.dart';
 import 'package:mindcare_app/screens/login/login_screen.dart';
 import 'package:mindcare_app/screens/help/help_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -94,19 +95,25 @@ class _SettingsScreenState extends State<SettingsScreen>
         opacity:
             _isLoggingOut ? _fadeAnimation : const AlwaysStoppedAnimation(1),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.w), // Adjust padding for responsiveness
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Tema',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20.sp, // Adjust font size
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h), // Adjust height for responsiveness
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Modo Escuro', style: TextStyle(fontSize: 16)),
+                  Text(
+                    'Modo Escuro',
+                    style: TextStyle(fontSize: 16.sp), // Adjust font size
+                  ),
                   Switch(
                     value: themeProvider.themeMode == ThemeMode.dark,
                     onChanged: (value) {
