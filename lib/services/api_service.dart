@@ -427,7 +427,7 @@ class ApiService {
   // Função para buscar emojis personalizados do usuário
   Future<List<String>> fetchCustomEmojis() async {
     final token = await _getToken();
-    final response = await getRequestWithAuth(Endpoint('diary/emojis'), token);
+    final response = await getRequestWithAuth(Endpoint('/diary/emojis'), token);
 
     if (response.statusCode == 200 && response.body.isNotEmpty) {
       final data = jsonDecode(response.body);
@@ -441,7 +441,7 @@ class ApiService {
   Future<void> updateCustomEmojis(List<String> emojis) async {
     final token = await _getToken();
     final response = await putRequestWithAuth(
-      Endpoint('diary/emojis'),
+      Endpoint('/diary/emojis'),
       {'emojis': emojis},
       token,
     );
