@@ -424,6 +424,33 @@ class ApiService {
     }
   }
 
+  // Função para buscar emojis personalizados do usuário
+  Future<List<String>> fetchCustomEmojis() async {
+    final token = await _getToken();
+    final response = await getRequestWithAuth(Endpoint('diary/emojis'), token);
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      final data = jsonDecode(response.body);
+      return List<String>.from(data);
+    } else {
+      throw Exception('Erro ao carregar emojis personalizados.');
+    }
+  }
+
+  // Função para atualizar emojis personalizados do usuário
+  Future<void> updateCustomEmojis(List<String> emojis) async {
+    final token = await _getToken();
+    final response = await putRequestWithAuth(
+      Endpoint('diary/emojis'),
+      {'emojis': emojis},
+      token,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao atualizar emojis personalizados.');
+    }
+  }
+
   // Função para listar vídeos pendentes de aprovação com paginação
   Future<http.Response> getPendingVideos(
       {int page = 1, int limit = 10, String? category}) async {

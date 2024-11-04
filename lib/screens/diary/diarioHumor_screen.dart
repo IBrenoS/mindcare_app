@@ -5,7 +5,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mindcare_app/services/api_service.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DiarioHumorScreen extends StatefulWidget {
@@ -26,6 +25,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 
   final List<String> defaultEmojis = ['😀', '😁', '🥹', '😔', '😡', '😫'];
   List<String> customEmojis = [];
+  List<String> allEmojis = [];
 
   // Controladores para análise de sentimento (simples)
   List<String> _keywords = [];
@@ -41,6 +41,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
     super.initState();
     _loadCustomEmojis();
     _initializeLocalization();
+    allEmojis = [...defaultEmojis];
   }
 
   @override
@@ -50,20 +51,50 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   }
 
   void _loadCustomEmojis() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? storedEmojis = prefs.getStringList('customEmojis');
-    setState(() {
-      customEmojis = storedEmojis ?? [];
-    });
+    try {
+      List<String> emojis = await apiService.fetchCustomEmojis();
+      setState(() {
+        customEmojis = emojis;
+        allEmojis = [...defaultEmojis, ...customEmojis];
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao carregar emojis personalizados: $e")),
+      );
+    }
   }
 
   void _adicionarEmojiPersonalizado(String emoji) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (!customEmojis.contains(emoji)) {
+    if (customEmojis.length < 6) {
       setState(() {
         customEmojis.add(emoji);
+        allEmojis = [...defaultEmojis, ...customEmojis];
       });
-      await prefs.setStringList('customEmojis', customEmojis);
+      try {
+        await apiService.updateCustomEmojis(customEmojis);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao atualizar emojis personalizados: $e")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Você pode personalizar até 6 emojis.")),
+      );
+    }
+  }
+
+  void _removerEmojiPersonalizado(String emoji) async {
+    setState(() {
+      customEmojis.remove(emoji);
+      allEmojis = [...defaultEmojis, ...customEmojis];
+    });
+    try {
+      await apiService.updateCustomEmojis(customEmojis);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao atualizar emojis personalizados: $e")),
+      );
     }
   }
 
@@ -220,6 +251,40 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 }
               },
               child: Text("Adicionar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _mostrarDialogoRemoverEmoji(String emoji) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Remover Emoji"),
+          content: Text("Tem certeza de que deseja remover este emoji?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (defaultEmojis.contains(emoji)) {
+                  setState(() {
+                    defaultEmojis.remove(emoji);
+                    allEmojis = [...defaultEmojis, ...customEmojis];
+                  });
+                } else {
+                  _removerEmojiPersonalizado(emoji);
+                }
+                Navigator.pop(context);
+              },
+              child: Text("Remover"),
             ),
           ],
         );
@@ -399,7 +464,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   @override
   Widget build(BuildContext context) {
     // Combinar emojis padrão com personalizados
-    List<String> todosEmojis = [...defaultEmojis, ...customEmojis];
+    allEmojis = [...defaultEmojis, ...customEmojis];
 
     // Filtrar entradas com base na busca
     List<Map<String, dynamic>> displayedEntries = _entradas.where((entrada) {
@@ -456,14 +521,17 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                       Expanded(
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: todosEmojis.length,
+                          itemCount: allEmojis.length,
                           itemBuilder: (context, index) {
-                            final emoji = todosEmojis[index];
+                            final emoji = allEmojis[index];
                             return GestureDetector(
                               onTap: () {
                                 setState(() {
                                   _selectedEmoji = emoji;
                                 });
+                              },
+                              onLongPress: () {
+                                _mostrarDialogoRemoverEmoji(emoji);
                               },
                               child: AnimatedContainer(
                                 duration: Duration(milliseconds: 300),
