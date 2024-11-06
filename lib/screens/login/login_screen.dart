@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:mindcare_app/screens/home/home_screen.dart';
 import 'package:mindcare_app/screens/password_recovery/password_recovery_screen.dart';
 import 'package:mindcare_app/screens/register/register_screen.dart';
-import 'package:mindcare_app/screens/theme/theme_screen.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

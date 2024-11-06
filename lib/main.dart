@@ -17,8 +17,8 @@ import 'screens/map/map_screen.dart';
 import './screens/password_recovery/password_recovery_screen.dart';
 import './screens/verify_code/verify_code_screen.dart';
 import './screens/reset_password/reset_password_screen.dart';
-import './screens/theme/theme_provider.dart';
-import './screens/theme/theme_screen.dart';
+import 'theme/theme_provider.dart';
+import 'theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

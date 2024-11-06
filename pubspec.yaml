@@ -31,7 +31,7 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # Notificações e mensagens push
-  
+
 
   # Funcionalidades de segurança e armazenamento local
   flutter_secure_storage: ^9.2.2
@@ -79,13 +79,13 @@ flutter:
     - assets/images/default_avatar.png
 
   fonts:
-    - family: Poppins
+    - family: Roboto
       fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Poppins-Italic.ttf
-          style: italic
-        - asset: assets/fonts/Poppins-BoldItalic.ttf
+    - family: NunitoSans
+      fonts:
+        - asset: assets/fonts/NunitoSans-Regular.ttf
+        - asset: assets/fonts/NunitoSans-Bold.ttf
           weight: 700
-          style: italic

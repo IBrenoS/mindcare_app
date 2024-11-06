@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mindcare_app/screens/theme/theme_provider.dart';
+import 'package:mindcare_app/theme/theme_provider.dart';
 import 'package:mindcare_app/screens/login/login_screen.dart';
 import 'package:mindcare_app/screens/help/help_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

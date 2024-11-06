@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:mindcare_app/screens/login/login_screen.dart';
-import 'package:mindcare_app/screens/theme/theme_screen.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
