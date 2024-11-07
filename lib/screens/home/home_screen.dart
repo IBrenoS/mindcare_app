@@ -5,7 +5,7 @@ import 'package:mindcare_app/screens/exercises/exercises_screen.dart';
 import 'package:mindcare_app/screens/map/map_screen.dart';
 import 'package:mindcare_app/screens/diary/diarioHumor_screen.dart';
 import 'package:mindcare_app/screens/profile/profile_screen.dart';
-import 'package:mindcare_app/screens/content/content_screen.dart'; // Importar a tela de conteúdo educativo
+import 'package:mindcare_app/screens/content/educationalContent_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,20 +36,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // Captura o tema atual para uso
+    final theme = Theme.of(context); // Captura o tema atual
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.primaryColor, // Usa a cor primária do tema
+        backgroundColor: theme.colorScheme.primary,
         title: Text(
           'Olá, [Nome]!', // Bem-vindo com nome do usuário
-          style: theme.textTheme.bodyLarge!
-              .copyWith(fontSize: 18.sp), // Aplica o tema ao texto
+          style: theme.textTheme.headlineLarge!.copyWith(
+            fontSize: 18.sp,
+            color: theme.colorScheme.onPrimary,
+          ),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
-            color: theme.iconTheme.color, // Usa a cor do ícone do tema
+            color: theme.colorScheme.onPrimary,
             onPressed: () {
               // Lógica para abrir notificações
             },
@@ -66,43 +68,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Função para construir a barra de navegação inferior
   Widget _buildBottomNavigationBar(BuildContext context) {
-    final theme = Theme.of(context); // Captura o tema atual
+    final theme = Theme.of(context);
 
     return BottomNavigationBar(
-      backgroundColor: theme.bottomNavigationBarTheme
-          .backgroundColor, // Usa a cor de fundo do tema
-      selectedItemColor: theme.bottomNavigationBarTheme
-          .selectedItemColor, // Cor dos itens selecionados
-      unselectedItemColor: theme.bottomNavigationBarTheme
-          .unselectedItemColor, // Cor dos itens não selecionados
+      backgroundColor: theme.bottomNavigationBarTheme.backgroundColor ??
+          theme.colorScheme.surface,
+      selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor ??
+          theme.colorScheme.primary,
+      unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor ??
+          theme.colorScheme.onSurface.withOpacity(0.7),
       selectedFontSize: 14.sp,
       unselectedFontSize: 12.sp,
       currentIndex: _selectedIndex,
       onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed, // Mantém a barra de navegação fixa
-      items: const [
+      type: BottomNavigationBarType.fixed,
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.self_improvement),
+          icon: const Icon(Icons.self_improvement),
           label: 'Meditações',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map), // Ícone que representa o mapa
+          icon: const Icon(Icons.map),
           label: 'Mapa',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.book),
+          icon: const Icon(Icons.book),
           label: 'Diário',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.chat_bubble_outline), // Ícone de balão de diálogo
+          icon: const Icon(Icons.chat_bubble_outline),
           label: 'Comunidade',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
+          icon: const Icon(Icons.person),
           label: 'Perfil',
         ),
       ],
