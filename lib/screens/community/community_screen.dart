@@ -5,8 +5,11 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:mindcare_app/services/api_service.dart';
 import 'package:mindcare_app/utils/time_formatter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class CommunityScreen extends StatefulWidget {
+  const CommunityScreen({Key? key}) : super(key: key);
+
   @override
   _CommunityScreenState createState() => _CommunityScreenState();
 }
@@ -15,28 +18,26 @@ class _CommunityScreenState extends State<CommunityScreen> {
   final ApiService apiService = ApiService();
   List<dynamic> posts = [];
   bool isLoading = true;
-  bool isLoadingMore = false; // Flag para controlar carregamento adicional
-  int currentPage = 1; // Página atual de postagens
-  final int postsPerPage = 10; // Número de postagens por página
+  bool isLoadingMore = false;
+  int currentPage = 1;
+  final int postsPerPage = 10;
   final ScrollController _scrollController = ScrollController();
   TextEditingController _commentController = TextEditingController();
-  TextEditingController _captionController =
-      TextEditingController(); // Controlador para legenda da postagem
+  TextEditingController _captionController = TextEditingController();
   String userProfileImageUrl = 'https://via.placeholder.com/50';
-  File? _selectedImage; // Armazena a imagem selecionada
+  File? _selectedImage;
 
   @override
   void initState() {
     super.initState();
-    fetchPosts(); // Carrega a primeira página de postagens
+    fetchPosts();
     fetchUserProfile();
 
-    // Adiciona listener ao ScrollController para detectar quando chegar no final da lista
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           !isLoadingMore) {
-        fetchMorePosts(); // Carrega mais postagens quando chega ao final
+        fetchMorePosts();
       }
     });
   }
@@ -53,7 +54,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
   }
 
-   Future<void> fetchPosts() async {
+  Future<void> fetchPosts() async {
     try {
       setState(() {
         isLoading = true;
@@ -61,8 +62,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       final fetchedPosts =
           await apiService.fetchPosts(currentPage, postsPerPage);
       setState(() {
-        posts =
-            fetchedPosts; // Inicializa a lista com a primeira página de postagens
+        posts = fetchedPosts;
         isLoading = false;
       });
     } catch (e) {
@@ -70,41 +70,54 @@ class _CommunityScreenState extends State<CommunityScreen> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar postagens')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao carregar postagens',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
 
-   // Função para carregar mais postagens ao rolar até o fim da lista
   Future<void> fetchMorePosts() async {
     try {
       setState(() {
-        isLoadingMore = true; // Ativa a flag de carregamento adicional
+        isLoadingMore = true;
       });
-      currentPage++; // Incrementa o número da página
+      currentPage++;
       final fetchedPosts =
           await apiService.fetchPosts(currentPage, postsPerPage);
       if (fetchedPosts.isNotEmpty) {
         setState(() {
-          posts.addAll(
-              fetchedPosts); // Adiciona mais postagens à lista existente
+          posts.addAll(fetchedPosts);
         });
       }
       setState(() {
-        isLoadingMore = false; // Desativa a flag de carregamento adicional
+        isLoadingMore = false;
       });
     } catch (e) {
       setState(() {
-        isLoadingMore =
-            false; // Garante que a flag seja desativada em caso de erro
+        isLoadingMore = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar mais postagens')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao carregar mais postagens',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
 
-   Future<void> toggleLikePost(String postId, bool isLiked) async {
+  Future<void> toggleLikePost(String postId, bool isLiked) async {
     try {
       await apiService.likePost(postId);
       setState(() {
@@ -122,7 +135,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao atualizar curtida')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao atualizar curtida',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
@@ -135,7 +156,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
       fetchPosts();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao adicionar comentário')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao adicionar comentário',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
     FocusScope.of(context).unfocus();
@@ -145,8 +174,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
       builder: (context) {
         return DraggableScrollableSheet(
@@ -157,18 +187,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
           builder: (context, scrollController) {
             return Container(
               decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
               ),
               child: Column(
                 children: [
                   Container(
-                    width: 40,
-                    height: 4,
-                    margin: EdgeInsets.only(top: 8, bottom: 10),
+                    width: 40.w,
+                    height: 4.h,
+                    margin: EdgeInsets.only(top: 8.h, bottom: 10.h),
                     decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(2),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      borderRadius: BorderRadius.circular(2.r),
                     ),
                   ),
                   Expanded(
@@ -188,16 +218,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             comment["userId"] is Map
                                 ? comment["userId"]["name"] ?? "Usuário"
                                 : "Usuário Desconhecido",
-                            style: TextStyle(color: Colors.white),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           subtitle: Text(
                             comment["comment"] ?? "",
-                            style: TextStyle(color: Colors.white70),
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: IconButton(
                             icon: Icon(
                               Icons.favorite_border,
-                              color: Colors.white,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                             onPressed: () {},
                           ),
@@ -211,7 +241,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: EdgeInsets.symmetric(horizontal: 8.0.w),
                           child: CircleAvatar(
                             backgroundImage: NetworkImage(userProfileImageUrl),
                           ),
@@ -221,16 +251,19 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             controller: _commentController,
                             decoration: InputDecoration(
                               hintText: 'Adicione um comentário...',
-                              hintStyle: TextStyle(color: Colors.white60),
+                              hintStyle: Theme.of(context).textTheme.bodyMedium,
                               border: InputBorder.none,
                               filled: true,
-                              fillColor: Colors.grey[800],
+                              fillColor: Theme.of(context).colorScheme.surface,
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.send, color: Colors.blue),
+                          icon: Icon(
+                            Icons.send,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           onPressed: () {
                             _addComment(postId);
                           },
@@ -247,21 +280,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  // Função para selecionar, editar e recortar a imagem antes de compartilhar
   Future<void> _pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      // Abre o editor de recorte de imagem
       CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
-        aspectRatio: const CropAspectRatio(
-            ratioX: 1, ratioY: 1), // Exemplo de proporção 1:1 (quadrado)
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Editar Imagem',
-            toolbarColor: Colors.deepOrange,
-            toolbarWidgetColor: Colors.white,
+            toolbarColor: Theme.of(context).colorScheme.primary,
+            toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
             hideBottomControls: false,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
@@ -284,31 +314,43 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
   }
 
-  // Modal inicial para escolher criar postagem com ou sem imagem
   void _showCreatePostOptions() {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (context) {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Selecionar Imagem da Galeria'),
+              leading: Icon(
+                Icons.photo_library,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              title: Text(
+                'Selecionar Imagem da Galeria',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               onTap: () async {
                 Navigator.pop(context);
-                await _pickImage(); // Abre a galeria para selecionar imagem
+                await _pickImage();
               },
             ),
             ListTile(
-              leading: Icon(Icons.text_fields),
-              title: Text('Postar Somente Texto'),
+              leading: Icon(
+                Icons.text_fields,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              title: Text(
+                'Postar Somente Texto',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               onTap: () {
                 Navigator.pop(context);
-                _showCreatePostModal(); // Abre o modal direto para texto
+                _showCreatePostModal();
               },
             ),
           ],
@@ -317,7 +359,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  // Modal para criar a postagem com a imagem selecionada ou somente texto
   void _showCreatePostModal() {
     showModalBottomSheet(
       context: context,
@@ -325,6 +366,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
@@ -340,11 +382,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.r),
                   child: AspectRatio(
-                    aspectRatio:
-                        1, // Define uma proporção consistente para o feed
+                    aspectRatio: 1,
                     child: Image.file(
                       _selectedImage!,
-                      fit: BoxFit.cover, // Ajusta a imagem para cobrir a área
+                      fit: BoxFit.cover,
                       width: double.infinity,
                       height: 200.h,
                     ),
@@ -355,15 +396,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 controller: _captionController,
                 decoration: InputDecoration(
                   hintText: 'Escreva uma legenda...',
-                  border: OutlineInputBorder(),
+                  hintStyle: Theme.of(context).textTheme.bodyMedium,
+                  border: const OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
                 ),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               SizedBox(height: 10.h),
               ElevatedButton(
                 onPressed: _createPost,
                 child: Text(
                   'Compartilhar',
-                  style: TextStyle(fontSize: 16.sp),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                 ),
               ),
             ],
@@ -373,24 +420,30 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  // Função para criar a postagem com a imagem e legenda ou apenas legenda
   Future<void> _createPost() async {
     try {
       await apiService.createPostWithImage(
         _captionController.text,
         _selectedImage,
       );
-      _clearCreatePostData(); // Limpa após a criação
-      fetchPosts(); // Atualiza as postagens após a criação
-      Navigator.pop(context); // Fecha o modal
+      _clearCreatePostData();
+      fetchPosts();
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao criar postagem')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao criar postagem',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
 
-  // Função para limpar os dados de criação de postagem ao sair do modal
   void _clearCreatePostData() {
     setState(() {
       _selectedImage = null;
@@ -404,32 +457,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
       appBar: AppBar(
         title: Text(
           'Comunidade',
-          style: TextStyle(fontSize: 20.sp),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed:
-                _showCreatePostOptions, // Exibe o modal para criar postagem
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: _showCreatePostOptions,
           ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: () async {
-                currentPage = 1; // Reseta a página para 1 ao fazer refresh
-                await fetchPosts(); // Recarrega as postagens
+                currentPage = 1;
+                await fetchPosts();
               },
               child: ListView.builder(
-                controller: _scrollController, // Controlador de rolagem
-                itemCount: posts.length +
-                    (isLoadingMore ? 1 : 0), // Adiciona item de carregamento
+                controller: _scrollController,
+                itemCount: posts.length + (isLoadingMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == posts.length) {
                     return Center(
-                      child:
-                          CircularProgressIndicator(), // Mostra um indicador de carregamento ao final da lista
+                      child: CircularProgressIndicator(),
                     );
                   }
                   final post = posts[index];
@@ -445,13 +502,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         ),
                         title: Text(
                           post["userId"]["name"] ?? 'Usuário',
-                          style: TextStyle(fontSize: 16.sp),
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         subtitle: Text(
                           formatarTempoEmPortugues(
                             DateTime.parse(post["createdAt"]),
                           ),
-                          style: TextStyle(fontSize: 14.sp),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),
                       if (post["imageUrl"] != null)
@@ -472,7 +529,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             horizontal: 16.w, vertical: 8.h),
                         child: Text(
                           post["content"] ?? '',
-                          style: TextStyle(fontSize: 14.sp),
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
                       Padding(
@@ -484,7 +541,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.favorite,
-                                    color: isLiked ? Colors.pink : Colors.grey,
+                                    color: isLiked
+                                        ? likeColor // Usa a constante likeColor importada do theme.dart
+                                        : Theme.of(context).iconTheme.color,
                                     size: 24.sp,
                                   ),
                                   onPressed: () {
@@ -493,13 +552,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                 ),
                                 Text(
                                   '${post["likes"]?.length ?? 0}',
-                                  style: TextStyle(fontSize: 14.sp),
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                               ],
                             ),
                             IconButton(
                               icon: Icon(
                                 Icons.mode_comment_outlined,
+                                color: Theme.of(context).iconTheme.color,
                                 size: 24.sp,
                               ),
                               onPressed: () {
@@ -509,7 +569,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             ),
                             Text(
                               '${post["comments"]?.length ?? 0} comentários',
-                              style: TextStyle(fontSize: 14.sp),
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
                         ),

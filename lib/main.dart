@@ -7,7 +7,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import './screens/register/register_screen.dart';
 import './screens/community/community_screen.dart';
 import './screens/content/content_management_screen.dart';
-import './screens/content/content_screen.dart';
+import 'screens/content/educationalContent_screen.dart';
 import 'screens/diary/diarioHumor_screen.dart';
 import './screens/exercises/exercises_screen.dart';
 import './screens/home/home_screen.dart';

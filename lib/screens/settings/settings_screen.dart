@@ -51,12 +51,11 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Future<void> _performLogout(BuildContext context) async {
     try {
-      // Remove o token de autenticação
       await _secureStorage.delete(key: 'authToken');
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Você saiu da sua conta com sucesso.'),
+        SnackBar(
+          content: const Text('Você saiu da sua conta com sucesso.'),
           backgroundColor: Colors.green,
         ),
       );
@@ -68,8 +67,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao sair da conta. Tente novamente.'),
+        SnackBar(
+          content: const Text('Erro ao sair da conta. Tente novamente.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -89,30 +88,38 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configurações'),
+        title: Text(
+          'Configurações',
+          style: TextStyle(fontSize: 20.sp),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: FadeTransition(
         opacity:
             _isLoggingOut ? _fadeAnimation : const AlwaysStoppedAnimation(1),
         child: Padding(
-          padding: EdgeInsets.all(16.w), // Adjust padding for responsiveness
+          padding: EdgeInsets.all(16.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Tema',
                 style: TextStyle(
-                  fontSize: 20.sp, // Adjust font size
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onBackground,
                 ),
               ),
-              SizedBox(height: 10.h), // Adjust height for responsiveness
+              SizedBox(height: 10.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Modo Escuro',
-                    style: TextStyle(fontSize: 16.sp), // Adjust font size
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   Switch(
                     value: themeProvider.themeMode == ThemeMode.dark,
@@ -126,9 +133,14 @@ class _SettingsScreenState extends State<SettingsScreen>
 
               // Opção para o botão de Suporte ao Usuário
               ListTile(
-                title: const Text('Suporte ao Usuário'),
-                leading:
-                    const Icon(Icons.help_outline, color: Colors.blueAccent),
+                title: Text(
+                  'Suporte ao Usuário',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                leading: Icon(Icons.help_outline, color: Colors.blueAccent),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -140,14 +152,25 @@ class _SettingsScreenState extends State<SettingsScreen>
 
               // Opção de Sair da Conta com animação
               ListTile(
-                title: const Text('Sair da Conta'),
+                title: Text(
+                  'Sair da Conta',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 leading: const Icon(Icons.logout, color: Colors.redAccent),
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('Sair da Conta'),
+                        title: Text(
+                          'Sair da Conta',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
                         content: const Text(
                             'Você realmente deseja sair da sua conta?'),
                         actions: <Widget>[
@@ -160,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               Navigator.of(context).pop();
                               _logoutWithAnimation();
                             },
-                            child: const Text(
+                            child: Text(
                               'Sair',
                               style: TextStyle(color: Colors.redAccent),
                             ),

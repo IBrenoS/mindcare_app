@@ -15,8 +15,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -60,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Login bem-sucedido!'),
-              backgroundColor: successColor,
+              backgroundColor: successColorLight,
             ),
           );
 
@@ -284,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               padding: EdgeInsets.symmetric(
                 horizontal: 55.w, // Responsive horizontal padding
-                vertical: 15.h,   // Responsive vertical padding
+                vertical: 15.h, // Responsive vertical padding
               ),
             ),
             child: Text(
@@ -328,7 +327,9 @@ class _LoginScreenState extends State<LoginScreen>
       child: Text(
         'Esqueceu a senha?',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? linkEsqueceuSenhaLight
+                  : linkEsqueceuSenhaDark,
             ),
       ),
     );
@@ -342,7 +343,9 @@ class _LoginScreenState extends State<LoginScreen>
       child: Text(
         'Criar nova Conta',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? linkNewContaLight
+                  : linkNewContaDark,
             ),
       ),
     );

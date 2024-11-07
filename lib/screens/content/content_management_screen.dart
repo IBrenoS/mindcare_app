@@ -4,8 +4,11 @@ import 'package:mindcare_app/screens/functions/article_preview_screen.dart';
 import 'package:mindcare_app/screens/functions/video_preview_screen.dart';
 import 'dart:convert';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class ContentManagementScreen extends StatefulWidget {
+  const ContentManagementScreen({Key? key}) : super(key: key);
+
   @override
   _ContentManagementScreenState createState() =>
       _ContentManagementScreenState();
@@ -52,8 +55,14 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   void _showAccessDenied() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(
-              'Acesso negado. Você não tem permissão para acessar esta tela.')),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        content: Text(
+          'Acesso negado. Você não tem permissão para acessar esta tela.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
+        ),
+      ),
     );
     Navigator.pop(context);
   }
@@ -66,7 +75,6 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       isLoading = true;
     });
     try {
-      // Modifique as requisições para incluir paginação
       final videosResponse = await apiService.getPendingVideos(
           page: currentPage, limit: itemsPerPage);
       final articlesResponse = await apiService.getPendingArticles(
@@ -74,11 +82,9 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
       setState(() {
         if (currentPage == 1) {
-          // Primeira página: substitui as listas
           pendingVideos = _parseResponse(videosResponse);
           pendingArticles = _parseResponse(articlesResponse);
         } else {
-          // Páginas adicionais: adiciona novos itens
           pendingVideos.addAll(_parseResponse(videosResponse));
           pendingArticles.addAll(_parseResponse(articlesResponse));
         }
@@ -92,14 +98,12 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
     }
   }
 
-// Função para carregar a próxima página
   void _loadNextPage() {
     setState(() {
       currentPage++;
     });
     _loadContent();
   }
-
 
   List<dynamic> _parseResponse(dynamic response) {
     if (response.statusCode == 200 && response.body.isNotEmpty) {
@@ -112,13 +116,29 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.error,
+        content: Text(
+          message,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: errorColorLight,
+              ),
+        ),
+      ),
     );
   }
 
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        backgroundColor: successColorLight,
+        content: Text(
+          message,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: msg,
+              ),
+        ),
+      ),
     );
   }
 
@@ -126,16 +146,37 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            )
           : DefaultTabController(
               length: 2,
               child: Column(
                 children: [
                   TabBar(
+                    labelColor: Theme.of(context).colorScheme.primary,
+                    unselectedLabelColor:
+                        Theme.of(context).colorScheme.onSurface,
+                    indicatorColor: Theme.of(context).colorScheme.primary,
                     tabs: [
-                      Tab(text: 'Vídeos Pendentes'),
-                      Tab(text: 'Artigos Pendentes'),
+                      Tab(
+                        child: Text(
+                          'Vídeos Pendentes',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                      Tab(
+                        child: Text(
+                          'Artigos Pendentes',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
                     ],
                   ),
                   Expanded(
@@ -154,11 +195,23 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      title: Text('Gerenciamento de Conteúdo'),
+      title: Text(
+        'Gerenciamento de Conteúdo',
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      iconTheme: IconThemeData(
+        color: Theme.of(context).colorScheme.onPrimary,
+      ),
       actions: isAdmin
           ? [
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: Icon(
+                  Icons.settings,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 onPressed: () {
                   // Navegar para outras funções administrativas
                 },
@@ -170,7 +223,12 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
   Widget _buildPendingVideos() {
     return pendingVideos.isEmpty
-        ? Center(child: Text('Nenhum vídeo pendente.'))
+        ? Center(
+            child: Text(
+              'Nenhum vídeo pendente.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          )
         : ListView.builder(
             itemCount: pendingVideos.length,
             itemBuilder: (context, index) {
@@ -187,6 +245,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
     return Card(
       margin: EdgeInsets.all(8.w),
+      color: Theme.of(context).colorScheme.surface,
       child: ListTile(
         leading: thumbnailUrl.isNotEmpty
             ? Image.network(
@@ -198,11 +257,20 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
             : Container(
                 width: 100.w,
                 height: 56.h,
-                color: Colors.grey,
-                child: Icon(Icons.image, color: Colors.white),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                child: Icon(
+                  Icons.image,
+                  color: Theme.of(context).iconTheme.color,
+                ),
               ),
-        title: Text(title, style: TextStyle(fontSize: 16.sp)),
-        subtitle: Text('Autor: $channelTitle', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        subtitle: Text(
+          'Autor: $channelTitle',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
         trailing: _buildActionButtons(video, true),
         onTap: () => _viewVideo(video),
       ),
@@ -211,7 +279,12 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
   Widget _buildPendingArticles() {
     return pendingArticles.isEmpty
-        ? Center(child: Text('Nenhum artigo pendente.'))
+        ? Center(
+            child: Text(
+              'Nenhum artigo pendente.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          )
         : ListView.builder(
             itemCount: pendingArticles.length,
             itemBuilder: (context, index) {
@@ -228,6 +301,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
 
     return Card(
       margin: EdgeInsets.all(8.w),
+      color: Theme.of(context).colorScheme.surface,
       child: ListTile(
         leading: thumbnailUrl.isNotEmpty
             ? Image.network(
@@ -239,11 +313,20 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
             : Container(
                 width: 100.w,
                 height: 56.h,
-                color: Colors.grey,
-                child: Icon(Icons.article, color: Colors.white),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                child: Icon(
+                  Icons.article,
+                  color: Theme.of(context).iconTheme.color,
+                ),
               ),
-        title: Text(title, style: TextStyle(fontSize: 16.sp)),
-        subtitle: Text('Autor: $author', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        subtitle: Text(
+          'Autor: $author',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
         trailing: _buildActionButtons(article, false),
         onTap: () => _viewArticle(article),
       ),
@@ -255,12 +338,18 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: Icon(Icons.check, color: Colors.green),
+          icon: Icon(
+            Icons.check,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           tooltip: 'Aprovar',
           onPressed: () => _approveContent(item['_id'], isVideo),
         ),
         IconButton(
-          icon: Icon(Icons.close, color: Colors.red),
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).colorScheme.error,
+          ),
           tooltip: 'Rejeitar',
           onPressed: () => _rejectContent(item['_id'], isVideo),
         ),
@@ -296,7 +385,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
         if (category != null) {
           final response = await apiService
               .approveVideo(contentId, category)
-              .timeout(Duration(seconds: 10));
+              .timeout(const Duration(seconds: 10));
 
           if (response.statusCode == 200) {
             _showSuccess('Vídeo aprovado com sucesso.');
@@ -307,7 +396,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       } else {
         final response = await apiService
             .approveArticle(contentId)
-            .timeout(Duration(seconds: 10));
+            .timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 200) {
           _showSuccess('Artigo aprovado com sucesso.');
@@ -333,10 +422,10 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       final response = isVideo
           ? await apiService
               .rejectVideo(contentId)
-              .timeout(Duration(seconds: 10))
+              .timeout(const Duration(seconds: 10))
           : await apiService
               .rejectArticle(contentId)
-              .timeout(Duration(seconds: 10));
+              .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         _showSuccess(isVideo
@@ -362,12 +451,18 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
       builder: (BuildContext context) {
         String? tempCategory;
         return AlertDialog(
-          title: Text('Selecione a Categoria'),
+          title: Text(
+            'Selecione a Categoria',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           content: DropdownButtonFormField<String>(
             items: ['Meditação', 'Relaxamento', 'Saúde']
                 .map((category) => DropdownMenuItem(
                       value: category,
-                      child: Text(category),
+                      child: Text(
+                        category,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ))
                 .toList(),
             onChanged: (value) {
@@ -375,6 +470,7 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
             },
             decoration: InputDecoration(
               labelText: 'Categoria',
+              labelStyle: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           actions: [
@@ -383,14 +479,27 @@ class _ContentManagementScreenState extends State<ContentManagementScreen> {
                 Navigator.of(context).pop();
                 selectedCategory = null;
               },
-              child: Text('Cancelar'),
+              child: Text(
+                'Cancelar',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 selectedCategory = tempCategory;
               },
-              child: Text('Confirmar'),
+              child: Text(
+                'Confirmar',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ],
         );

@@ -42,9 +42,17 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         throw Exception('Erro ao buscar vídeos: ${response.statusCode}');
       }
     } catch (e) {
-      print("Erro: ${e.toString()}");
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Erro ao carregar vídeos.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Erro ao carregar vídeos.",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -72,18 +80,16 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       appBar: AppBar(
         title: Text(
           'Exercícios de Meditação',
-          style: TextStyle(
-            fontSize: 20.sp, // Responsive font size
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        titleTextStyle: TextStyle(
-            color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
       ),
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -91,7 +97,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           Expanded(
             child: _isLoading
                 ? Center(
-                    child: CircularProgressIndicator(color: Colors.blueAccent))
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  )
                 : _filteredVideos.isNotEmpty
                     ? ListView.builder(
                         itemCount: _filteredVideos.length,
@@ -107,7 +116,12 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           );
                         },
                       )
-                    : Center(child: Text("Nenhum vídeo encontrado")),
+                    : Center(
+                        child: Text(
+                          "Nenhum vídeo encontrado",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
           ),
         ],
       ),
@@ -128,23 +142,27 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 _filterVideosByCategory(category == 'Todos' ? '' : category);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.0.w), // Responsive margin
-                padding: EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 8.0.h), // Responsive padding
+                margin: EdgeInsets.symmetric(
+                    horizontal: 8.0.w), // Responsive margin
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12.0.w, vertical: 8.0.h), // Responsive padding
                 decoration: BoxDecoration(
                   color: _selectedCategory == category
-                      ? Colors.blueAccent
-                      : Colors.white,
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
                 child: Text(
                   category,
-                  style: TextStyle(
-                    color: _selectedCategory == category
-                        ? Colors.white
-                        : Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _selectedCategory == category
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
             );
@@ -154,21 +172,20 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
- // Widget para construir cada card de vídeo
+  // Widget para construir cada card de vídeo
   Widget _buildVideoCard(BuildContext context, String title, String description,
       String thumbnailUrl, String category, String videoUrl) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0.h, horizontal: 16.0.w), // Responsive padding
+      padding: EdgeInsets.symmetric(
+          vertical: 8.0.h, horizontal: 16.0.w), // Responsive padding
       child: InkWell(
         onTap: () {
-          // Usar Navigator.push normalmente para empilhar a tela de vídeo sobre a de Meditação
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => VideoPlayerScreen(videoUrl: videoUrl),
             ),
           ).then((_) {
-            // Redefine a orientação para retrato ao retornar
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.portraitUp,
             ]);
@@ -179,7 +196,8 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           children: [
             // Thumbnail do vídeo
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.r), // Responsive border radius
+              borderRadius:
+                  BorderRadius.circular(8.r), // Responsive border radius
               child: Image.network(
                 thumbnailUrl,
                 width: double.infinity,
@@ -192,42 +210,43 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             SizedBox(height: 8.h), // Responsive spacing
             // Informações do vídeo (Título e categoria)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0.w), // Responsive padding
+              padding:
+                  EdgeInsets.symmetric(horizontal: 8.0.w), // Responsive padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                        fontSize: 16.sp, // Responsive font size
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.h), // Responsive spacing
                   Text(
                     category,
-                    style: TextStyle(
-                      fontSize: 14.sp, // Responsive font size
-                      color: Colors.blueAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   SizedBox(height: 4.h), // Responsive spacing
                   Text(
                     description,
-                    style: TextStyle(
-                      fontSize: 14.sp, // Responsive font size
-                      color: Colors.grey[800],
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            Divider(color: Colors.grey[300]),
+            Divider(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ],
         ),
       ),

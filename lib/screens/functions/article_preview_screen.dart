@@ -25,7 +25,16 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
       await launch(url);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Não foi possível abrir o link do artigo.")),
+        SnackBar(
+          content: Text(
+            "Não foi possível abrir o link do artigo.",
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Theme.of(context).colorScheme.onError),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
     }
   }
@@ -44,30 +53,36 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 20.sp), // Responsive font size
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium
+              ?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0.w), // Responsive padding
+        padding: EdgeInsets.all(16.0.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Imagem do artigo
             if (imageUrl.isNotEmpty)
               Container(
-                margin: EdgeInsets.only(bottom: 16.0.h), // Responsive margin
+                margin: EdgeInsets.only(bottom: 16.0.h),
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: 200.h, // Responsive height
+                  height: 200.h,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey[200],
-                      height: 200.h, // Responsive height
+                      color: Theme.of(context).colorScheme.surface,
+                      height: 200.h,
                       child: Center(
-                        child: Icon(Icons.broken_image,
-                            size: 50, color: Colors.grey),
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     );
                   },
@@ -76,45 +91,56 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
             // Título do artigo
             Text(
               title,
-              style: TextStyle(
-                fontSize: 24.sp, // Responsive font size
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
             ),
-            SizedBox(height: 8.0.h), // Responsive spacing
+            SizedBox(height: 8.0.h),
             // Autor do artigo
             Text(
               'Autor: $author',
-              style: TextStyle(
-                fontSize: 16.sp, // Responsive font size
-                color: Colors.grey[700],
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
-            SizedBox(height: 16.0.h), // Responsive spacing
+            SizedBox(height: 16.0.h),
             // Conteúdo do artigo com opção de expandir
             Text(
               _isExpanded ? content : '${content.substring(0, 200)}...',
-              style: TextStyle(
-                fontSize: 16.sp, // Responsive font size
-                height: 1.5,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
             ),
-            SizedBox(height: 8.0.h), // Responsive spacing
+            SizedBox(height: 8.0.h),
             // Botão de "Leia Mais" para expandir o conteúdo completo
             TextButton(
               onPressed: _toggleReadMore,
-              child: Text(_isExpanded ? "Mostrar menos" : "Leia mais"),
+              child: Text(
+                _isExpanded ? "Mostrar menos" : "Leia mais",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             ),
-            SizedBox(height: 16.0.h), // Responsive spacing
+            SizedBox(height: 16.0.h),
             // Botão para abrir o artigo na web, se a URL estiver disponível
             if (articleUrl.isNotEmpty)
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () => _launchURL(articleUrl),
                   icon: Icon(Icons.open_in_browser),
-                  label: Text("Abrir Artigo Original"),
+                  label: Text(
+                    "Abrir Artigo Original",
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary),
+                  ),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h), // Responsive padding
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),

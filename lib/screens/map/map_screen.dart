@@ -6,8 +6,11 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -18,7 +21,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _currentPosition;
   Set<Marker> _markers = {};
   bool _isLoading = true;
-  bool _isFilterVisible = false; // Inicialmente oculta
+  bool _isFilterVisible = false;
   String _selectedFilter = "Todos";
 
   @override
@@ -27,7 +30,6 @@ class _MapScreenState extends State<MapScreen> {
     _requestLocationPermission();
   }
 
-  // Solicita a permissão de localização
   Future<void> _requestLocationPermission() async {
     final status = await Permission.location.request();
     if (status.isGranted) {
@@ -35,12 +37,19 @@ class _MapScreenState extends State<MapScreen> {
     } else {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Permissão de localização negada')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Permissão de localização negada',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
 
-  // Obter a localização atual e carregar os pontos de apoio
   Future<void> _getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -51,7 +60,6 @@ class _MapScreenState extends State<MapScreen> {
     _loadSupportPoints();
   }
 
-  // Carrega os pontos de apoio próximos usando a API
   Future<void> _loadSupportPoints({String query = "Todos"}) async {
     if (_currentPosition == null) return;
     try {
@@ -63,7 +71,6 @@ class _MapScreenState extends State<MapScreen> {
         sortBy: 'distance',
       );
 
-      // Adicionar marcadores ao mapa para cada ponto de apoio
       setState(() {
         _markers = nearbyPoints['results'].map<Marker>((point) {
           return Marker(
@@ -82,12 +89,19 @@ class _MapScreenState extends State<MapScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar pontos de apoio: $e')),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            'Erro ao carregar pontos de apoio: $e',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
 
-  // Função que será chamada quando o marcador for clicado
   void _onMarkerTapped(Map<String, dynamic> point) {
     _mapController.animateCamera(
       CameraUpdate.newLatLngZoom(
@@ -98,29 +112,32 @@ class _MapScreenState extends State<MapScreen> {
     _showBottomSheetDetails(point);
   }
 
-  // Exibe o BottomSheet com os detalhes do ponto de apoio
   void _showBottomSheetDetails(Map<String, dynamic> point) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
       builder: (context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.5,
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0.w),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(point['title'],
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                SizedBox(height: 8),
-                Text(point['address'], style: TextStyle(fontSize: 16)),
-                SizedBox(height: 8),
+                Text(
+                  point['title'],
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  point['address'],
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                SizedBox(height: 8.h),
                 Row(
                   children: [
                     RatingBarIndicator(
@@ -128,28 +145,33 @@ class _MapScreenState extends State<MapScreen> {
                           double.tryParse(point['rating'].toString()) ?? 0.0,
                       itemBuilder: (context, index) => Icon(
                         Icons.star,
-                        color: Colors.amber,
+                        color: rateColor,
                       ),
                       itemCount: 5,
-                      itemSize: 25.0,
+                      itemSize: 25.0.w,
                       direction: Axis.horizontal,
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Text(
-                        point['rating'] != null
-                            ? '${point['rating']}'
-                            : 'Sem avaliação',
-                        style: TextStyle(fontSize: 16)),
+                      point['rating'] != null
+                          ? '${point['rating']}'
+                          : 'Sem avaliação',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ],
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Horário:',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
+                    Text(
+                      'Horário:',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 8.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,15 +179,17 @@ class _MapScreenState extends State<MapScreen> {
                           Text(
                             point['opening_hours']?['status'] ??
                                 'Status não disponível',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: point['opening_hours']?['status'] ==
-                                      'Aberto agora'
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  color: point['opening_hours']?['status'] ==
+                                          'Aberto agora'
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: 4.h),
                           if (point['opening_hours'] != null &&
                               point['opening_hours']['text'] != null)
                             Column(
@@ -174,36 +198,61 @@ class _MapScreenState extends State<MapScreen> {
                                   point['opening_hours']['text'].length,
                                   (index) {
                                 return Text(
-                                    point['opening_hours']['text'][index],
-                                    style: TextStyle(fontSize: 14));
+                                  point['opening_hours']['text'][index],
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                );
                               }),
                             )
                           else
-                            Text('Horário não disponível',
-                                style: TextStyle(fontSize: 14)),
+                            Text(
+                              'Horário não disponível',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 if (point['photos'] != null && point['photos'].isNotEmpty)
                   _buildPhotoCarousel(point['photos']),
-                SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton.icon(
                       onPressed: () => _openDirectionsInGoogleMaps(
                           point['position']['lat'], point['position']['lng']),
-                      icon: Icon(Icons.directions),
-                      label: Text('Obter Direção'),
+                      icon: Icon(
+                        Icons.directions,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      label: Text(
+                        'Obter Direção',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                     ElevatedButton.icon(
                       onPressed: () => _openStreetView(
                           point['position']['lat'], point['position']['lng']),
-                      icon: Icon(Icons.streetview),
-                      label: Text('Street View'),
+                      icon: Icon(
+                        Icons.streetview,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      label: Text(
+                        'Street View',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ],
                 ),
@@ -216,17 +265,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildPhotoCarousel(List photos) {
-    return Container(
-      height: 200.h, // Adjusted for responsiveness
+    return SizedBox(
+      height: 200.h,
       child: PageView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: photos.length,
         itemBuilder: (context, index) {
           final photo = photos[index];
           return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: EdgeInsets.only(right: 8.0.w),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.0.r),
               child: Image.network(photo['url'], fit: BoxFit.cover),
             ),
           );
@@ -237,20 +286,20 @@ class _MapScreenState extends State<MapScreen> {
 
   void _openDirectionsInGoogleMaps(double lat, double lng) async {
     final url = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng';
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
-      print('Não foi possível abrir o Google Maps');
+      _showError('Não foi possível abrir o Google Maps');
     }
   }
 
   void _openStreetView(double lat, double lng) async {
     final url =
         'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=$lat,$lng';
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
-      print('Não foi possível abrir o Street View');
+      _showError('Não foi possível abrir o Street View');
     }
   }
 
@@ -262,13 +311,34 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.error,
+        content: Text(
+          message,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Stack(
         children: [
           _isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                )
               : GoogleMap(
                   onMapCreated: (controller) => _mapController = controller,
                   initialCameraPosition: CameraPosition(
@@ -279,57 +349,80 @@ class _MapScreenState extends State<MapScreen> {
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                   zoomControlsEnabled: false,
-                   mapToolbarEnabled: false,
+                  mapToolbarEnabled: false,
                   onTap: (_) =>
                       setState(() => _isFilterVisible = !_isFilterVisible),
                 ),
           if (_isFilterVisible)
             Positioned(
-              top: 20.h, // Adjusted for responsiveness
+              top: 20.h,
               left: 20.w,
               right: 20.w,
               child: AnimatedOpacity(
                 opacity: _isFilterVisible ? 1.0 : 0.0,
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilterChip(
-                      label: Text("CRAS"),
+                      label: Text(
+                        "CRAS",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       selected: _selectedFilter == "CRAS",
                       onSelected: (_) => setState(() {
                         _selectedFilter = "CRAS";
                         _loadSupportPoints(query: "CRAS");
                       }),
+                      selectedColor: Theme.of(context).colorScheme.secondary,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      checkmarkColor: Theme.of(context).colorScheme.onSecondary,
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     FilterChip(
-                      label: Text("Psiquiátricas"),
+                      label: Text(
+                        "Psiquiátricas",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       selected: _selectedFilter == "Clínicas Psiquiátricas",
                       onSelected: (_) => setState(() {
                         _selectedFilter = "Clínicas Psiquiátricas";
                         _loadSupportPoints(query: "Clínicas Psiquiátricas");
                       }),
+                      selectedColor: Theme.of(context).colorScheme.secondary,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      checkmarkColor: Theme.of(context).colorScheme.onSecondary,
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     FilterChip(
-                      label: Text("Psicólogos"),
+                      label: Text(
+                        "Psicólogos",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       selected: _selectedFilter == "Clínicas psicológicas",
                       onSelected: (_) => setState(() {
                         _selectedFilter = "Clínicas psicológicas";
                         _loadSupportPoints(query: "Clínicas psicológicas");
                       }),
+                      selectedColor: Theme.of(context).colorScheme.secondary,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      checkmarkColor: Theme.of(context).colorScheme.onSecondary,
                     ),
                   ],
                 ),
               ),
             ),
           Positioned(
-            bottom: 20.h, // Adjusted for responsiveness
+            bottom: 20.h,
             right: 20.w,
             child: FloatingActionButton(
               onPressed: _centerMap,
-              child: Icon(Icons.my_location, size: 24.sp), // Responsive icon size
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Icon(
+                Icons.my_location,
+                size: 24.sp,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ],

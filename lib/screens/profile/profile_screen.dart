@@ -10,6 +10,8 @@ import 'package:mindcare_app/screens/content/content_management_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserProfileScreen extends StatefulWidget {
+  const UserProfileScreen({Key? key}) : super(key: key);
+
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
@@ -38,7 +40,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   void dispose() {
-    // Limpa os controladores de texto para evitar vazamentos de memória
     nameController.dispose();
     emailController.dispose();
     bioController.dispose();
@@ -110,8 +111,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           uiSettings: [
             AndroidUiSettings(
               toolbarTitle: 'Editar Imagem',
-              toolbarColor: Colors.black,
-              toolbarWidgetColor: Colors.white,
+              toolbarColor: Theme.of(context).colorScheme.primary,
+              toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
               initAspectRatio: CropAspectRatioPreset.square,
               lockAspectRatio: true,
             ),
@@ -174,7 +175,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Perfil atualizado com sucesso!')),
+          SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            content: Text(
+              'Perfil atualizado com sucesso!',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+            ),
+          ),
         );
         toggleEditMode();
       } else {
@@ -220,8 +229,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: Theme.of(context).colorScheme.error,
+        content: Text(
+          message,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
+        ),
       ),
     );
   }
@@ -230,14 +244,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Adjust font size using ScreenUtil
         title: Text(
           isEditing ? 'Editar Perfil' : 'Perfil do Usuário',
-          style: TextStyle(fontSize: 18.sp),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.menu),
+            icon: Icon(
+              Icons.menu,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onSelected: (value) {
               if (value == 'edit') {
                 toggleEditMode();
@@ -253,25 +275,37 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               PopupMenuItem<String>(
                 value: 'edit',
                 child: ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('Editar Informações'),
+                  leading: Icon(
+                    Icons.edit,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    'Editar Informações',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ),
               ),
               PopupMenuItem<String>(
                 value: 'settings',
                 child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('Configurações'),
+                  leading: Icon(
+                    Icons.settings,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  title: Text(
+                    'Configurações',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ),
               ),
             ],
           ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Stack(
         children: [
           SingleChildScrollView(
-            // Adjust padding using ScreenUtil
             padding: EdgeInsets.all(16.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -279,47 +313,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 GestureDetector(
                   onTap: isEditing ? pickAndCropImage : null,
                   child: CircleAvatar(
-                    // Adjust radius using ScreenUtil
                     radius: 50.r,
                     backgroundImage: _selectedImage != null
                         ? FileImage(_selectedImage!)
                         : (profileImageUrl != null
                                 ? NetworkImage(profileImageUrl!)
-                                : AssetImage(
+                                : const AssetImage(
                                     'assets/images/default_avatar.png'))
                             as ImageProvider,
                   ),
                 ),
-                SizedBox(height: 16.h), // Adjust height using ScreenUtil
+                SizedBox(height: 16.h),
                 if (!isEditing)
                   Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Adjust font size using ScreenUtil
                           Text(
                             nameController.text,
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.headlineMedium,
                           ),
-                          SizedBox(width: 8.w), // Adjust width using ScreenUtil
+                          SizedBox(width: 8.w),
                           if (userRole == 'moderator')
                             _buildBadge('Moderador', Colors.red),
                           if (userRole == 'admin')
                             _buildBadge('Administrador', Colors.amber),
                         ],
                       ),
-                      SizedBox(height: 8.h), // Adjust height using ScreenUtil
-                      // Adjust font size using ScreenUtil
+                      SizedBox(height: 8.h),
                       Text(
                         bioController.text,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.grey[700],
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onBackground,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 20.h),
@@ -333,7 +360,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ContentManagementScreen()),
                             );
                           },
-                          child: Text('Gerenciar Conteúdos'),
+                          child: Text(
+                            'Gerenciar Conteúdos',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                ),
+                          ),
                         ),
                     ],
                   ),
@@ -362,14 +398,30 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         label: 'Nova Senha',
                         obscureText: true,
                       ),
-                      SizedBox(height: 20.h), // Adjust height using ScreenUtil
+                      SizedBox(height: 20.h),
                       ElevatedButton(
                         onPressed: saveProfile,
-                        child: Text('Salvar Alterações'),
+                        child: Text(
+                          'Salvar Alterações',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                        ),
                       ),
                       TextButton(
                         onPressed: toggleEditMode,
-                        child: Text('Cancelar'),
+                        child: Text(
+                          'Cancelar',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -379,7 +431,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: Center(
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             ),
@@ -394,25 +446,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     bool obscureText = false,
   }) {
     return Padding(
-      // Adjust vertical padding using ScreenUtil
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
-          // Adjust border radius using ScreenUtil
+          labelStyle: Theme.of(context).textTheme.bodyMedium,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.r),
           ),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.surface,
         ),
+        style: Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }
 
   Widget _buildBadge(String text, Color color) {
     return Container(
-      // Adjust padding using ScreenUtil
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: color.withOpacity(0.2),
@@ -420,11 +473,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 14.sp, // Adjust font size using ScreenUtil
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }

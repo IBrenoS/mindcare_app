@@ -62,7 +62,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               content: Row(
                 children: [
                   Icon(Icons.check_circle, color: Colors.green),
-                  SizedBox(width: 8),
+                  SizedBox(width: 8.w),
                   Expanded(
                     child: Text(
                       'Se o e-mail estiver cadastrado, um código de verificação será enviado.',
@@ -105,7 +105,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         content: Row(
           children: [
             Icon(Icons.error, color: Colors.red),
-            SizedBox(width: 8),
+            SizedBox(width: 8.w),
             Expanded(
               child: Text(
                 message,
@@ -122,10 +122,8 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Set background color using Theme
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        // Adjust font size using ScreenUtil
         title: Text(
           'Recuperação de Senha',
           style: TextStyle(
@@ -141,13 +139,12 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w), // Adjust padding using ScreenUtil
+        padding: EdgeInsets.all(16.w),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Adjust font size using ScreenUtil
               Text(
                 'Insira seu e-mail cadastrado para recuperar sua senha.',
                 textAlign: TextAlign.center,
@@ -156,7 +153,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              SizedBox(height: 24.h), // Adjust height using ScreenUtil
+              SizedBox(height: 24.h),
               TextFormField(
                 controller: _emailController,
                 style:
@@ -170,9 +167,9 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 12.h,
                     horizontal: 16.w,
-                  ), // Adjust padding using ScreenUtil
+                  ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r), // Adjust radius
+                    borderRadius: BorderRadius.circular(10.r),
                     borderSide:
                         BorderSide(color: Theme.of(context).dividerColor),
                   ),
@@ -188,7 +185,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.h), // Adjust height using ScreenUtil
+              SizedBox(height: 24.h),
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
@@ -200,8 +197,8 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                         padding: EdgeInsets.symmetric(
                           horizontal: 50.w,
                           vertical: 15.h,
-                        ), // Adjust padding using ScreenUtil
-                        textStyle: TextStyle(fontSize: 18.sp), // Adjust font size
+                        ),
+                        textStyle: TextStyle(fontSize: 18.sp),
                       ),
                       child: Text(
                         'Recuperar Senha',

@@ -6,7 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ArticleDetailScreen extends StatelessWidget {
   final Map<String, dynamic> article;
 
-  ArticleDetailScreen({required this.article});
+  const ArticleDetailScreen({Key? key, required this.article})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,17 +15,29 @@ class ArticleDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           article['title'] ?? "Artigo",
-          style: TextStyle(fontSize: 20.sp),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.bookmark_border),
+            icon: Icon(
+              Icons.bookmark_border,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: () {
               // Lógica para favoritar o artigo
             },
           ),
           IconButton(
-            icon: Icon(Icons.share),
+            icon: Icon(
+              Icons.share,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: () {
               // Compartilha o link do artigo
               Share.share(article['url'] ?? '');
@@ -50,30 +63,35 @@ class ArticleDetailScreen extends StatelessWidget {
             SizedBox(height: 10.h),
             Text(
               article['title'] ?? '',
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             SizedBox(height: 10.h),
             Text(
               "Por ${article['author'] ?? 'Autor desconhecido'} - ${article['source'] ?? 'Fonte desconhecida'}",
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
             ),
             SizedBox(height: 20.h),
             Text(
               article['content'] ??
                   "Este é um resumo. Para ler o artigo completo, acesse o link abaixo.",
-              style: TextStyle(fontSize: 16.sp, height: 1.5),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             SizedBox(height: 20.h),
-            // Link para o artigo completo
             ElevatedButton.icon(
-              icon: Icon(Icons.link),
+              icon: Icon(
+                Icons.link,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
               label: Text(
                 "Leia o artigo completo",
-                style: TextStyle(fontSize: 14.sp),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () async {
                 final url = article['url'];
@@ -81,7 +99,15 @@ class ArticleDetailScreen extends StatelessWidget {
                   await launch(url);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Não foi possível abrir o link.")),
+                    SnackBar(
+                      content: Text(
+                        "Não foi possível abrir o link.",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onError,
+                            ),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
                   );
                 }
               },

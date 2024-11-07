@@ -22,8 +22,6 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   @override
   void initState() {
     super.initState();
-    // Capturando o e-mail corretamente usando os argumentos
-    // Verifica se o e-mail foi recebido corretamente através do construtor ou da navegação de rotas
     receivedEmail = widget.email.isNotEmpty
         ? widget.email
         : (ModalRoute.of(context)?.settings.arguments as String?) ?? '';
@@ -63,9 +61,8 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => ResetPasswordScreen(
-                email: widget.email, // Passe o e-mail corretamente
-                code: _codeController.text
-                    .trim(), // Passe o código inserido pelo usuário
+                email: widget.email,
+                code: _codeController.text.trim(),
               ),
             ),
           );
@@ -98,30 +95,28 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Adjust font size using ScreenUtil
         title: Text('Verificar Código', style: TextStyle(fontSize: 18.sp)),
         backgroundColor: Colors.lightBlue.shade700,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w), // Adjust padding using ScreenUtil
+        padding: EdgeInsets.all(16.w),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Adjust font size using ScreenUtil
               Text(
                 'Insira o código enviado para o e-mail ${receivedEmail.isNotEmpty ? receivedEmail : "não informado"}.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 20.h), // Adjust height using ScreenUtil
+              SizedBox(height: 20.h),
               TextFormField(
                 controller: _codeController,
                 decoration: InputDecoration(
                   labelText: 'Código de Verificação',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r), // Adjust radius
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -135,11 +130,18 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20.h), // Adjust height using ScreenUtil
+              SizedBox(height: 20.h),
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _verifyCode,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 50.w,
+                          vertical: 15.h,
+                        ),
+                        textStyle: TextStyle(fontSize: 16.sp),
+                      ),
                       child: const Text('Verificar Código'),
                     ),
             ],

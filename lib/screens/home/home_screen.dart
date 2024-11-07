@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mindcare_app/screens/community/community_screen.dart';
@@ -6,6 +7,7 @@ import 'package:mindcare_app/screens/map/map_screen.dart';
 import 'package:mindcare_app/screens/diary/diarioHumor_screen.dart';
 import 'package:mindcare_app/screens/profile/profile_screen.dart';
 import 'package:mindcare_app/screens/content/educationalContent_screen.dart';
+import 'package:mindcare_app/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,18 +18,62 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  String userName = '';
+  String greeting = '';
+  final ApiService _apiService = ApiService();
+  Timer? _timer;
 
-  // Lista de páginas para exibição dentro do IndexedStack
   final List<Widget> _pages = [
-    EducationalContentScreen(), // Conteúdo educativo como nova Home
-    ExercisesScreen(), // Tela de meditação ou exercícios
-    MapScreen(), // Tela do mapa substituindo gamificação
-    DiarioHumorScreen(), // Tela de diário
-    CommunityScreen(), // Tela de comunidade
-    UserProfileScreen(), // Tela de perfil do usuário
+    EducationalContentScreen(),
+    ExercisesScreen(),
+    MapScreen(),
+    DiarioHumorScreen(),
+    CommunityScreen(),
+    UserProfileScreen(),
   ];
 
-  // Função para alternar entre as páginas
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+    _updateGreeting();
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      _updateGreeting();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final profileData = await _apiService.fetchUserProfile();
+      setState(() {
+        userName = profileData['name'] ?? 'Usuário';
+      });
+    } catch (e) {
+      print('Erro ao carregar o perfil do usuário: $e');
+    }
+  }
+
+  void _updateGreeting() {
+    final hour = DateTime.now().hour;
+    setState(() {
+      if (hour >= 6 && hour < 12) {
+        greeting = 'Bom dia ☀️';
+      } else if (hour >= 12 && hour < 18) {
+        greeting = 'Boa tarde 🌞';
+      } else if (hour >= 18 && hour < 24) {
+        greeting = 'Boa noite 🌜';
+      } else {
+        greeting = 'Boa madrugada 🌌';
+      }
+    });
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -36,13 +82,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // Captura o tema atual
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
         title: Text(
-          'Olá, [Nome]!', // Bem-vindo com nome do usuário
+          '$greeting, $userName!',
           style: theme.textTheme.headlineLarge!.copyWith(
             fontSize: 18.sp,
             color: theme.colorScheme.onPrimary,
@@ -66,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Função para construir a barra de navegação inferior
   Widget _buildBottomNavigationBar(BuildContext context) {
     final theme = Theme.of(context);
 

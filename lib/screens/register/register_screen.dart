@@ -119,7 +119,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Criar Conta', style: TextStyle(fontSize: 18.sp)),
+        title: Text(
+          'Criar Conta',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Center(
@@ -132,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 350.w, // Adjusted width for responsiveness
+                    width: 350.w,
                     child: Column(
                       children: [
                         _buildTextField(
@@ -145,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h), // Responsive spacing
+                        SizedBox(height: 16.h),
                         _buildTextField(
                           controller: _emailController,
                           labelText: 'E-mail',
@@ -161,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h), // Responsive spacing
+                        SizedBox(height: 16.h),
                         _buildTextField(
                           controller: _phoneController,
                           labelText: 'Telefone',
@@ -176,7 +181,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.h), // Responsive spacing
+                        SizedBox(height: 16.h),
                         _buildPasswordField(
                           controller: _passwordController,
                           labelText: 'Senha',
@@ -187,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             });
                           },
                         ),
-                        SizedBox(height: 16.h), // Responsive spacing
+                        SizedBox(height: 16.h),
                         _buildPasswordField(
                           controller: _confirmPasswordController,
                           labelText: 'Confirmação de Senha',
@@ -205,9 +210,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 24.h), // Responsive spacing
+                        SizedBox(height: 24.h),
                         _buildRegisterButton(),
-                        SizedBox(height: 16.h), // Responsive spacing
+                        SizedBox(height: 16.h),
                         _buildLoginLink(),
                       ],
                     ),
@@ -233,21 +238,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
         labelText: labelText,
         fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
-        labelStyle: TextStyle(
-            fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         suffixIcon: onTapSuffix != null
             ? IconButton(
-                icon:
-                    Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+                icon: Icon(
+                  obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Theme.of(context).iconTheme.color,
+                ),
                 onPressed: onTapSuffix,
               )
             : null,
@@ -266,19 +272,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
         labelText: labelText,
         fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
-        labelStyle: TextStyle(
-            fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface),
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Theme.of(context).iconTheme.color,
+          ),
           onPressed: onTapSuffix,
         ),
       ),
@@ -297,28 +305,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRegisterButton() {
     return _isLoading
-        ? const CircularProgressIndicator()
+        ? CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary)
         : SizedBox(
-            width: 210.w, // Adjusted for responsiveness
+            width: 210.w,
             height: 50.h,
             child: ElevatedButton(
               onPressed: _register,
               style: ElevatedButton.styleFrom(
-                backgroundColor: bottomColor,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 50.w, // Responsive horizontal padding
-                  vertical: 15.h,   // Responsive vertical padding
-                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.r), // Responsive radius
+                  borderRadius: BorderRadius.circular(15.r),
                 ),
               ),
               child: Text(
                 'Criar Conta',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: 18.sp, // Responsive font size
-                ),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
               ),
             ),
           );
@@ -352,10 +356,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       },
       child: Text(
         'Já tem uma conta? Faça login',
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.secondary,
-          fontSize: 14.sp,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).brightness == Brightness.light
+                  ? linkNewContaLight // Usa linkNewContaLight no tema claro
+                  : linkEsqueceuSenhaDark, // Usa linkEsqueceuSenhaDark no tema escuro
+            ),
       ),
     );
   }

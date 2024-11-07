@@ -3,11 +3,14 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mindcare_app/services/api_service.dart';
+import 'package:mindcare_app/theme/theme.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DiarioHumorScreen extends StatefulWidget {
+  const DiarioHumorScreen({Key? key}) : super(key: key);
+
   @override
   _DiarioHumorScreenState createState() => _DiarioHumorScreenState();
 }
@@ -72,14 +75,42 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       });
       try {
         await apiService.updateCustomEmojis(customEmojis);
+        // Exibir mensagem de sucesso
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: successColorLight,
+            content: Text(
+              "Emoji adicionado com sucesso!",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: msg,
+                  ),
+            ),
+          ),
+        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao atualizar emojis personalizados: $e")),
+          SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Text(
+              "Erro ao atualizar emojis personalizados: $e",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
+            ),
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Você pode personalizar até 6 emojis.")),
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.error,
+          content: Text(
+            "Você pode personalizar até 6 emojis.",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+        ),
       );
     }
   }
@@ -101,7 +132,8 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   void _registrarHumor() async {
     if (_selectedEmoji.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Selecione um emoji que representa seu humor")),
+        const SnackBar(
+            content: Text("Selecione um emoji que representa seu humor")),
       );
       return;
     }
@@ -123,7 +155,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
-            children: [
+            children: const [
               Icon(Icons.check_circle, color: Colors.green),
               SizedBox(width: 8),
               Text("Entrada de humor registrada com sucesso!"),
@@ -144,7 +176,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       setState(() {
         _isLoading = false;
       });
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () {
         setState(() {
           _isRegistered = false;
         });
@@ -197,20 +229,18 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
     try {
       await initializeDateFormatting('pt_BR', null);
     } catch (e) {
-      // Adicionar uma verificação ou log em caso de falha
+      // Log de erro
       print("Erro ao inicializar a formatação de data: $e");
     }
-    _carregarHistorico(); // Agora carregue o histórico após garantir a inicialização.
+    _carregarHistorico(); // Carrega o histórico após a inicialização.
   }
 
   String formatarData(DateTime data) {
-    // Converte a data para o horário local antes de formatar
     DateTime dataLocal = data.toLocal();
     return DateFormat.yMMMMd('pt_BR').format(dataLocal);
   }
 
   String formatarHora(DateTime data) {
-    // Converte a data para o horário local antes de formatar
     DateTime dataLocal = data.toLocal();
     return DateFormat.Hm().format(dataLocal);
   }
@@ -230,17 +260,31 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Adicionar Emoji Personalizado"),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(
+            "Adicionar Emoji Personalizado",
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
           content: TextField(
             controller: emojiController,
-            decoration: InputDecoration(hintText: "Digite ou cole o emoji"),
+            decoration: InputDecoration(
+              hintText: "Digite ou cole o emoji",
+              hintStyle: Theme.of(context).textTheme.bodyMedium,
+              border: const OutlineInputBorder(),
+            ),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Cancelar"),
+              child: Text(
+                "Cancelar",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -250,7 +294,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   Navigator.pop(context);
                 }
               },
-              child: Text("Adicionar"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                "Adicionar",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+              ),
             ),
           ],
         );
@@ -263,14 +315,26 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Remover Emoji"),
-          content: Text("Tem certeza de que deseja remover este emoji?"),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(
+            "Remover Emoji",
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          content: Text(
+            "Tem certeza de que deseja remover este emoji?",
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Cancelar"),
+              child: Text(
+                "Cancelar",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -284,7 +348,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 }
                 Navigator.pop(context);
               },
-              child: Text("Remover"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                "Remover",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+              ),
             ),
           ],
         );
@@ -297,19 +369,24 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Detalhes do Humor"),
+          title: const Text("Detalhes do Humor"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 entrada['moodEmoji'] ?? '',
-                style: TextStyle(fontSize: 48),
+                style: const TextStyle(fontSize: 48),
               ),
-              SizedBox(height: 10),
-              Text(entrada['entry'] ?? ''),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                  "Registrado em ${formatarData(DateTime.parse(entrada['createdAt']))} às ${formatarHora(DateTime.parse(entrada['createdAt']))}"),
+                entrada['entry'] ?? '',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Registrado em ${formatarData(DateTime.parse(entrada['createdAt']))} às ${formatarHora(DateTime.parse(entrada['createdAt']))}",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ],
           ),
           actions: [
@@ -317,21 +394,21 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Fechar"),
+              child: const Text("Fechar"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 _mostrarDialogoEditarEntrada(entrada);
               },
-              child: Text("Editar"),
+              child: const Text("Editar"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 _confirmarExcluirEntrada(entrada['_id']);
               },
-              child: Text("Excluir"),
+              child: const Text("Excluir"),
             ),
           ],
         );
@@ -348,7 +425,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Editar Entrada"),
+          title: const Text("Editar Entrada"),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -363,29 +440,31 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: editSelectedEmoji == emoji
-                              ? Colors.blue
-                              : Colors.grey[200],
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           emoji,
-                          style: TextStyle(fontSize: 32),
+                          style: const TextStyle(fontSize: 32),
                         ),
                       ),
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: editEntryController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     labelText: "Editar descrição",
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    labelStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
             ),
@@ -395,7 +474,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Cancelar"),
+              child: const Text("Cancelar"),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -408,7 +487,8 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   Navigator.pop(context);
                   _carregarHistorico(refresh: true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Entrada atualizada com sucesso!")),
+                    const SnackBar(
+                        content: Text("Entrada atualizada com sucesso!")),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -416,7 +496,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   );
                 }
               },
-              child: Text("Salvar"),
+              child: const Text("Salvar"),
             ),
           ],
         );
@@ -429,14 +509,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Excluir Entrada"),
-          content: Text("Tem certeza de que deseja excluir esta entrada?"),
+          title: const Text("Excluir Entrada"),
+          content:
+              const Text("Tem certeza de que deseja excluir esta entrada?"),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Cancelar"),
+              child: const Text("Cancelar"),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -445,7 +526,8 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   Navigator.pop(context);
                   _carregarHistorico(refresh: true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Entrada excluída com sucesso!")),
+                    const SnackBar(
+                        content: Text("Entrada excluída com sucesso!")),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -453,7 +535,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   );
                 }
               },
-              child: Text("Excluir"),
+              child: const Text("Excluir"),
             ),
           ],
         );
@@ -474,17 +556,29 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Diário de Humor"),
+        title: Text(
+          "Diário de Humor",
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.show_chart),
+            icon: Icon(
+              Icons.show_chart,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: () {
               FocusScope.of(context).unfocus();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        GraficoHumorScreen(entradas: _entradas)),
+                  builder: (context) => GraficoHumorScreen(entradas: _entradas),
+                ),
               );
             },
           ),
@@ -495,26 +589,21 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
           _carregarHistorico(refresh: true);
         },
         child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.all(16.0.w), // Responsive padding
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Seção de Registro de Emoções
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Como você está se sentindo?",
-                    style: TextStyle(
-                      fontSize: 18.sp, // Responsive font size
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                Text(
+                  "Como você está se sentindo?",
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 SizedBox(height: 10.h), // Responsive spacing
 
                 // Scroll horizontal para emojis com botão de adicionar
-                Container(
+                SizedBox(
                   height: 70.h, // Responsive height
                   child: Row(
                     children: [
@@ -534,19 +623,20 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                                 _mostrarDialogoRemoverEmoji(emoji);
                               },
                               child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
+                                duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
-                                margin: EdgeInsets.symmetric(horizontal: 4),
-                                padding: EdgeInsets.all(12),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: _selectedEmoji == emoji
-                                      ? Colors.blue
-                                      : Colors.grey[200],
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   emoji,
-                                  style: TextStyle(fontSize: 32),
+                                  style: const TextStyle(fontSize: 32),
                                 ),
                               ).animate().fadeIn(),
                             );
@@ -554,7 +644,10 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: Icon(
+                          Icons.add,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         onPressed: _mostrarDialogoAdicionarEmoji,
                       ),
                     ],
@@ -569,11 +662,11 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   decoration: InputDecoration(
                     labelText: "Descreva seu humor (opcional)",
                     hintText: "O que aconteceu hoje que influenciou seu humor?",
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(fontSize: 16.sp), // Responsive font size
-                    hintStyle: TextStyle(fontSize: 14.sp), // Responsive font size
+                    border: const OutlineInputBorder(),
+                    labelStyle: Theme.of(context).textTheme.bodyMedium,
+                    hintStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  style: TextStyle(fontSize: 14.sp), // Responsive font size
+                  style: Theme.of(context).textTheme.bodyLarge,
                   onChanged: (text) {
                     _analisarSentimento(text);
                   },
@@ -585,7 +678,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     ? Wrap(
                         spacing: 8,
                         children: _keywords
-                            .map((keyword) => Chip(label: Text(keyword)))
+                            .map((keyword) => Chip(
+                                  label: Text(
+                                    keyword,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.secondary,
+                                ))
                             .toList(),
                       )
                     : Container(),
@@ -599,8 +700,20 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _registrarHumor,
                       child: _isLoading
-                          ? SpinKitCircle(color: Colors.white, size: 30.w) // Responsive size
-                          : Text("Registrar Humor", style: TextStyle(fontSize: 16.sp)), // Responsive font size
+                          ? SpinKitCircle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              size: 30.w,
+                            ) // Responsive size
+                          : Text(
+                              "Registrar Humor",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                            ), // Responsive font size
                     ).animate().scale(),
                   ),
                 ),
@@ -610,29 +723,25 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 _isRegistered
                     ? AnimatedOpacity(
                         opacity: _isRegistered ? 1.0 : 0.0,
-                        duration: Duration(seconds: 1),
+                        duration: const Duration(seconds: 1),
                         child: Text(
                           "Humor registrado com sucesso!",
-                          style: TextStyle(
-                            fontSize: 16.sp, // Responsive font size
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontWeight: FontWeight.bold,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                       )
                     : Container(),
 
-                Divider(),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Histórico de Humor",
-                    style: TextStyle(
-                      fontSize: 18.sp, // Responsive font size
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                const Divider(),
+                Text(
+                  "Histórico de Humor",
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 SizedBox(height: 10.h), // Responsive spacing
 
@@ -640,7 +749,10 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('Filtrar:'),
+                    Text(
+                      'Filtrar:',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                     SizedBox(width: 10.w), // Responsive spacing
                     DropdownButton<String>(
                       value: _selectedFilter,
@@ -648,7 +760,10 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                           .map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(
+                            value,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
@@ -666,9 +781,14 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 TextField(
                   decoration: InputDecoration(
                     labelText: "Buscar no histórico",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    border: const OutlineInputBorder(),
+                    labelStyle: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                   onChanged: (text) {
                     setState(() {
                       _searchQuery = text.toLowerCase();
@@ -679,10 +799,15 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 
                 // Histórico de humor com animações
                 displayedEntries.isEmpty
-                    ? Center(child: Text("Nenhum registro encontrado."))
+                    ? Center(
+                        child: Text(
+                          "Nenhum registro encontrado.",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      )
                     : ListView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: displayedEntries.length,
                         itemBuilder: (context, index) {
                           final entrada = displayedEntries[index];
@@ -692,12 +817,22 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                           final String texto = entrada['entry'];
 
                           return ListTile(
-                            leading:
-                                Text(moodEmoji, style: TextStyle(fontSize: 32)),
-                            title: Text(texto),
+                            leading: Text(
+                              moodEmoji,
+                              style: const TextStyle(fontSize: 32),
+                            ),
+                            title: Text(
+                              texto,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
                             subtitle: Text(
-                                "Registrado em ${formatarData(createdAt)} às ${formatarHora(createdAt)}"),
-                            trailing: Icon(Icons.arrow_forward_ios),
+                              "Registrado em ${formatarData(createdAt)} às ${formatarHora(createdAt)}",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Theme.of(context).iconTheme.color,
+                            ),
                             onTap: () {
                               // Ao tocar, exibir detalhes ou opções de edição
                               _mostrarDetalhesEntrada(entrada);
@@ -711,12 +846,24 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   child: SizedBox(
                     width: 200.w, // Responsive width
                     child: _isFetchingMore
-                        ? SpinKitCircle(color: Colors.blue, size: 30.w) // Responsive size
+                        ? SpinKitCircle(
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 30.w,
+                          ) // Responsive size
                         : ElevatedButton(
                             onPressed: () {
                               _carregarHistorico();
                             },
-                            child: Text("Carregar Mais", style: TextStyle(fontSize: 16.sp)), // Responsive font size
+                            child: Text(
+                              "Carregar Mais",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                            ), // Responsive font size
                           ).animate().scale(),
                   ),
                 ),
@@ -733,7 +880,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 class GraficoHumorScreen extends StatelessWidget {
   final List<Map<String, dynamic>> entradas;
 
-  GraficoHumorScreen({required this.entradas});
+  GraficoHumorScreen({Key? key, required this.entradas}) : super(key: key);
 
   // Converter o emoji em valor numérico
   int getMoodValue(String emoji) {
@@ -764,7 +911,15 @@ class GraficoHumorScreen extends StatelessWidget {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text("Gráfico de Humor")),
+      appBar: AppBar(
+        title: Text(
+          "Gráfico de Humor",
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Margem externa do gráfico
         child: SfCartesianChart(
@@ -772,12 +927,12 @@ class GraficoHumorScreen extends StatelessWidget {
           plotAreaBackgroundColor:
               Colors.transparent, // Transparente para estética
           plotAreaBorderColor: Colors.transparent, // Remover borda visual
-          margin: EdgeInsets.all(
+          margin: const EdgeInsets.all(
               16), // Adiciona uma margem para melhorar espaçamento
           primaryXAxis: DateTimeAxis(
             minimum: data.isNotEmpty
                 ? data.last.date
-                : DateTime.now().subtract(Duration(days: 30)),
+                : DateTime.now().subtract(const Duration(days: 30)),
             maximum: data.isNotEmpty ? data.first.date : DateTime.now(),
             intervalType: DateTimeIntervalType.days, // Exibir por dias
             edgeLabelPlacement: EdgeLabelPlacement
@@ -785,6 +940,7 @@ class GraficoHumorScreen extends StatelessWidget {
             enableAutoIntervalOnZooming:
                 true, // Permite ajuste dinâmico dos intervalos ao fazer zoom
             dateFormat: DateFormat.MMM('pt_BR'),
+            labelStyle: Theme.of(context).textTheme.bodySmall,
           ),
           primaryYAxis: NumericAxis(
             minimum: 0,
@@ -793,19 +949,26 @@ class GraficoHumorScreen extends StatelessWidget {
             axisLabelFormatter: (AxisLabelRenderDetails args) {
               switch (args.value.toInt()) {
                 case 0:
-                  return ChartAxisLabel('😫', TextStyle());
+                  return ChartAxisLabel(
+                      '😫', Theme.of(context).textTheme.bodySmall!);
                 case 1:
-                  return ChartAxisLabel('😡', TextStyle());
+                  return ChartAxisLabel(
+                      '😡', Theme.of(context).textTheme.bodySmall!);
                 case 2:
-                  return ChartAxisLabel('😔', TextStyle());
+                  return ChartAxisLabel(
+                      '😔', Theme.of(context).textTheme.bodySmall!);
                 case 3:
-                  return ChartAxisLabel('🥹', TextStyle());
+                  return ChartAxisLabel(
+                      '🥹', Theme.of(context).textTheme.bodySmall!);
                 case 4:
-                  return ChartAxisLabel('😁', TextStyle());
+                  return ChartAxisLabel(
+                      '😁', Theme.of(context).textTheme.bodySmall!);
                 case 5:
-                  return ChartAxisLabel('😀', TextStyle());
+                  return ChartAxisLabel(
+                      '😀', Theme.of(context).textTheme.bodySmall!);
                 default:
-                  return ChartAxisLabel('', TextStyle());
+                  return ChartAxisLabel(
+                      '', Theme.of(context).textTheme.bodySmall!);
               }
             },
           ),
@@ -818,11 +981,12 @@ class GraficoHumorScreen extends StatelessWidget {
           ),
           series: <CartesianSeries>[
             LineSeries<ChartData, DateTime>(
+              color: Theme.of(context).colorScheme.primary,
               dataSource: data,
               xValueMapper: (ChartData entry, _) => entry.date,
               yValueMapper: (ChartData entry, _) => entry.moodValue,
-              dataLabelSettings: DataLabelSettings(isVisible: true),
-              markerSettings: MarkerSettings(isVisible: true),
+              dataLabelSettings: const DataLabelSettings(isVisible: true),
+              markerSettings: const MarkerSettings(isVisible: true),
               onPointTap: (ChartPointDetails details) {
                 // Ao tocar no ponto, mostrar detalhes
                 final entrada = entradas[details.pointIndex!];
@@ -830,13 +994,15 @@ class GraficoHumorScreen extends StatelessWidget {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: Text("Detalhes do Humor"),
+                      title: const Text("Detalhes do Humor"),
                       content: Text(
-                          "${entrada['moodEmoji']} - ${entrada['entry']}\nData: ${DateFormat.yMMMMd('pt_BR').format(DateTime.parse(entrada['createdAt']))}"),
+                        "${entrada['moodEmoji']} - ${entrada['entry']}\nData: ${DateFormat.yMMMMd('pt_BR').format(DateTime.parse(entrada['createdAt']))}",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text("Fechar"),
+                          child: const Text("Fechar"),
                         ),
                       ],
                     );

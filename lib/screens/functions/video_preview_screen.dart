@@ -42,9 +42,18 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final title = widget.video['title'] ?? 'Vídeo';
+    final description = widget.video['description'] ?? 'Sem descrição.';
+    final channelName = widget.video['channelName'] ?? 'Autor desconhecido';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.video['title'] ?? 'Vídeo'),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
       ),
       body: isVideoValid
           ? Column(
@@ -52,22 +61,27 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                 YoutubePlayer(
                   controller: _controller,
                   showVideoProgressIndicator: true,
+                  progressIndicatorColor: Theme.of(context).colorScheme.primary,
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16.0.w), // Responsive padding using ScreenUtil
+                  padding: EdgeInsets.all(16.0.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.video['description'] ?? 'Sem descrição.',
-                        style: TextStyle(fontSize: 16.sp), // Responsive font size
+                        description,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontSize: 16.sp,
+                            ),
                       ),
-                      SizedBox(height: 8.0.h), // Responsive height
+                      SizedBox(height: 8.0.h),
                       Text(
-                        "Canal: ${widget.video['channelName'] ?? 'Autor desconhecido'}",
-                        style: TextStyle(
-                            fontSize: 14.sp, // Responsive font size
-                            fontWeight: FontWeight.bold),
+                        "Canal: $channelName",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                       ),
                     ],
                   ),
@@ -77,10 +91,10 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
           : Center(
               child: Text(
                 'URL do vídeo inválida.',
-                style: TextStyle(
-                  fontSize: 18.sp, // Responsive font size
-                  color: Colors.red,
-                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 18.sp,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
               ),
             ),
     );

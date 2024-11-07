@@ -5,6 +5,8 @@ import 'package:mindcare_app/screens/content/articleDetail_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EducationalContentScreen extends StatefulWidget {
+  const EducationalContentScreen({Key? key}) : super(key: key);
+
   @override
   _EducationalContentScreenState createState() =>
       _EducationalContentScreenState();
@@ -15,7 +17,7 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
   bool isLoading = true;
   int currentPage = 1;
   final int articlesPerPage = 20;
-  bool hasMoreArticles = true; // Controle de artigos restantes para carregar
+  bool hasMoreArticles = true;
 
   @override
   void initState() {
@@ -55,7 +57,17 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
       setState(() {
         isLoading = false;
       });
-      print("Erro: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Erro ao carregar artigos.",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -65,11 +77,20 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
       appBar: AppBar(
         title: Text(
           "Conteúdo Educativo",
-          style: TextStyle(fontSize: 20.sp), // Adjust font size responsively
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: isLoading && articles.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            )
           : articles.isEmpty
               ? Center(
                   child: Column(
@@ -78,14 +99,23 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                       Text(
                         "Erro ao carregar artigos ou nenhum artigo disponível.",
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16.sp),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       SizedBox(height: 10.h),
                       ElevatedButton(
                         onPressed: _loadApprovedArticles,
                         child: Text(
                           "Tentar novamente",
-                          style: TextStyle(fontSize: 14.sp),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ],
@@ -106,7 +136,13 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                       if (index == articles.length) {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 15.h),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ),
                         );
                       }
 
@@ -115,7 +151,8 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+                        margin: EdgeInsets.symmetric(
+                            vertical: 10.h, horizontal: 15.w),
                         elevation: 2,
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10.w),
@@ -132,10 +169,10 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                             article['title'] ?? '',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,12 +182,19 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                                 article['summary'] ?? '',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 14.sp),
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               SizedBox(height: 5.h),
                               Text(
                                 "Por ${article['author'] ?? 'Desconhecido'} - ${article['source'] ?? ''}",
-                                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                    ),
                               ),
                             ],
                           ),
