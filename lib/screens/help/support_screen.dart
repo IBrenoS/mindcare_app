@@ -147,7 +147,7 @@ class _SupportScreenState extends State<SupportScreen> {
               SizedBox(height: 24.h),
               // Botão Enviar
               SizedBox(
-                width: double.infinity,
+                 width: 200.w,
                 child: ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
