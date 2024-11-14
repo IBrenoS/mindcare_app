@@ -22,6 +22,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   File? _selectedImage;
   bool isEditing = false;
   bool isLoading = false;
+  bool _isCurrentPasswordObscured = true;
+  bool _isNewPasswordObscured = true;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -391,12 +393,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       _buildTextField(
                         controller: currentPasswordController,
                         label: 'Senha Atual',
-                        obscureText: true,
+                        obscureText: _isCurrentPasswordObscured,
+                        toggleObscureText: () {
+                          setState(() {
+                            _isCurrentPasswordObscured = !_isCurrentPasswordObscured;
+                          });
+                        },
                       ),
                       _buildTextField(
                         controller: newPasswordController,
                         label: 'Nova Senha',
-                        obscureText: true,
+                        obscureText: _isNewPasswordObscured,
+                        toggleObscureText: () {
+                          setState(() {
+                            _isNewPasswordObscured = !_isNewPasswordObscured;
+                          });
+                        },
                       ),
                       SizedBox(height: 20.h),
                       ElevatedButton(
@@ -444,6 +456,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     required TextEditingController controller,
     required String label,
     bool obscureText = false,
+    VoidCallback? toggleObscureText,
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -458,6 +471,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
+          suffixIcon: toggleObscureText != null
+              ? IconButton(
+                  icon: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: toggleObscureText,
+                )
+              : null,
         ),
         style: Theme.of(context).textTheme.bodyLarge,
       ),

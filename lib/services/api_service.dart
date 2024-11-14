@@ -608,4 +608,53 @@ class ApiService {
     }
   }
 
+  // Função para enviar mensagem de contato ao suporte
+  Future<http.Response> sendContactMessage({
+    required String name,
+    required String email,
+    required String subject,
+    required String message,
+  }) async {
+    // Obter o token de autenticação
+    final token = await _getToken();
+
+    // Verificar se o token é válido
+    if (token.value.isEmpty) {
+      throw Exception("Acesso negado. Sem token.");
+    }
+
+    // Definir a URL do endpoint de contato
+    final endpoint = Endpoint('contact/suport');
+
+    // Criar o corpo da requisição
+    final data = {
+      'name': name,
+      'email': email,
+      'subject': subject,
+      'message': message,
+    };
+
+    try {
+      // Fazer a requisição POST com autenticação
+      final response = await postRequestWithAuth(endpoint, data, token);
+
+      // Verificar se a resposta foi bem-sucedida (status 200 ou 201)
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response;
+      } else {
+        logger.e('Erro ao enviar mensagem de contato: ${response.body}');
+        throw Exception(
+            'Erro ao enviar mensagem de contato: ${response.statusCode}');
+      }
+    } on SocketException {
+      throw Exception('Falha na conexão. Verifique sua internet.');
+    } on TimeoutException {
+      throw Exception(
+          'Tempo de resposta esgotado. Tente novamente mais tarde.');
+    } catch (e) {
+      logger.e('Erro inesperado ao enviar mensagem de contato: $e');
+      rethrow;
+    }
+  }
+
 }
