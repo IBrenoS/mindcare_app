@@ -25,7 +25,6 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
     receivedEmail = widget.email.isNotEmpty
         ? widget.email
         : (ModalRoute.of(context)?.settings.arguments as String?) ?? '';
-    print('E-mail recebido na tela de verificação: $receivedEmail');
   }
 
   // Função para verificar o código de recuperação
@@ -38,7 +37,6 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
       try {
         final email = receivedEmail.trim();
         final code = _codeController.text.trim();
-        print('Verificando código: $code para o e-mail: $email');
 
         final response = await http.post(
           Uri.parse(
@@ -53,8 +51,6 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
         setState(() {
           _isLoading = false;
         });
-
-        print('Resposta do backend: ${response.statusCode} - ${response.body}');
 
         if (response.statusCode == 200) {
           Navigator.pushReplacement(
@@ -75,7 +71,6 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
         setState(() {
           _isLoading = false;
         });
-        print('Erro ao verificar o código: $e');
         _showError('Erro de rede. Tente novamente mais tarde.');
       }
     }
@@ -85,67 +80,146 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        content: Row(
+          children: [
+            Icon(Icons.error_outline,
+                color: Theme.of(context).colorScheme.onError),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: Theme.of(context).colorScheme.onError),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verificar Código', style: TextStyle(fontSize: 18.sp)),
-        backgroundColor: Colors.lightBlue.shade700,
+        title: Text(
+          'Verificar Código',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Insira o código enviado para o e-mail ${receivedEmail.isNotEmpty ? receivedEmail : "não informado"}.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16.sp),
-              ),
-              SizedBox(height: 20.h),
-              TextFormField(
-                controller: _codeController,
-                decoration: InputDecoration(
-                  labelText: 'Código de Verificação',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.lock_open,
+                    size: 80.sp,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o código de verificação';
-                  }
-                  if (!RegExp(r'^\d{6}$').hasMatch(value)) {
-                    return 'O código deve ter 6 dígitos numéricos';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20.h),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _verifyCode,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 50.w,
-                          vertical: 15.h,
+                  SizedBox(height: 20.h),
+                  Text(
+                    'Insira o código enviado para o e-mail:',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16.sp,
+                          color: Theme.of(context).colorScheme.onBackground,
                         ),
-                        textStyle: TextStyle(fontSize: 16.sp),
-                      ),
-                      child: const Text('Verificar Código'),
-                    ),
-            ],
+                  ),
+                  SizedBox(height: 5.h),
+                  Text(
+                    receivedEmail.isNotEmpty
+                        ? receivedEmail
+                        : "E-mail não informado",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildCodeField(),
+                  SizedBox(height: 20.h),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : _buildVerifyButton(),
+                ],
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCodeField() {
+    return TextFormField(
+      controller: _codeController,
+      keyboardType: TextInputType.number,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+      decoration: InputDecoration(
+        labelText: 'Código de Verificação',
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+        prefixIcon: Icon(
+          Icons.vpn_key_outlined,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, insira o código de verificação';
+        }
+        if (!RegExp(r'^\d{6}$').hasMatch(value)) {
+          return 'O código deve ter 6 dígitos numéricos';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildVerifyButton() {
+    return SizedBox(
+      width: 180.w,
+      child: ElevatedButton(
+        onPressed: _verifyCode,
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.r),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+        child: Text(
+          'Verificar Código',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 18.sp,
+              ),
         ),
       ),
     );

@@ -103,6 +103,9 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _onMarkerTapped(Map<String, dynamic> point) {
+
+     FocusScope.of(context).unfocus();
+     
     _mapController.animateCamera(
       CameraUpdate.newLatLngZoom(
         LatLng(point['position']['lat'], point['position']['lng']),
@@ -113,6 +116,9 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _showBottomSheetDetails(Map<String, dynamic> point) {
+
+    FocusManager.instance.primaryFocus?.unfocus();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

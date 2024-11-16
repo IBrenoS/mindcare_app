@@ -26,6 +26,8 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   final int _limit = 10;
   ApiService apiService = ApiService();
 
+  final FocusNode _textFieldFocusNode = FocusNode();
+
   final List<String> defaultEmojis = ['😀', '😁', '🥹', '😔', '😡', '😫'];
   List<String> customEmojis = [];
   List<String> allEmojis = [];
@@ -50,6 +52,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
   @override
   void dispose() {
     _entryController.dispose();
+    _textFieldFocusNode.dispose();
     super.dispose();
   }
 
@@ -496,7 +499,12 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                   );
                 }
               },
-              child: const Text("Salvar"),
+              child: Text(
+                "Salvar",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+              ),
+             ),
             ),
           ],
         );
@@ -658,13 +666,14 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                 // Campo de texto para descrever o humor com prompt de reflexão
                 TextField(
                   controller: _entryController,
+                  focusNode: _textFieldFocusNode,
                   maxLines: 4,
                   decoration: InputDecoration(
                     labelText: "Descreva seu humor (opcional)",
                     hintText: "O que aconteceu hoje que influenciou seu humor?",
                     border: const OutlineInputBorder(),
-                    labelStyle: Theme.of(context).textTheme.bodyMedium,
-                    hintStyle: Theme.of(context).textTheme.bodyMedium,
+                    labelStyle: Theme.of(context).textTheme.labelLarge,
+                    hintStyle: Theme.of(context).textTheme.labelLarge,
                   ),
                   style: Theme.of(context).textTheme.bodyLarge,
                   onChanged: (text) {
@@ -786,7 +795,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     border: const OutlineInputBorder(),
-                    labelStyle: Theme.of(context).textTheme.bodyMedium,
+                    labelStyle: Theme.of(context).textTheme.labelLarge,
                   ),
                   style: Theme.of(context).textTheme.bodyLarge,
                   onChanged: (text) {

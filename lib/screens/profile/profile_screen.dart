@@ -42,6 +42,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   void dispose() {
+    // modo de edição seja encerrado ao sair da tela
+    if (isEditing) {
+      setState(() {
+        isEditing = false;
+      });
+    }
     nameController.dispose();
     emailController.dispose();
     bioController.dispose();
@@ -93,9 +99,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Verificar se a tela ainda está ativa e, se não estiver, desativar o modo de edição
+    if (!ModalRoute.of(context)!.isCurrent && isEditing) {
+      setState(() {
+        isEditing = false;
+      });
+    }
+  }
+
   void toggleEditMode() {
     setState(() {
       isEditing = !isEditing;
+      // Fechar o teclado virtual ao sair do modo de edição
+      FocusScope.of(context).unfocus();
+      
     });
   }
 

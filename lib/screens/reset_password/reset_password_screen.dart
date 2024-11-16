@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:mindcare_app/screens/login/login_screen.dart';
+import 'package:mindcare_app/theme/theme.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
@@ -19,9 +20,11 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -29,9 +32,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   late String receivedEmail = widget.email.isNotEmpty ? widget.email : '';
   late String receivedCode = widget.code.isNotEmpty ? widget.code : '';
 
+  // Variáveis para verificar as regras da senha
+  bool _isMinLength = false;
+  bool _hasUppercase = false;
+  bool _hasLowercase = false;
+  bool _hasNumber = false;
+  bool _hasSpecialChar = false;
+
   @override
   void initState() {
     super.initState();
+    _passwordController.addListener(_checkPasswordRules);
+  }
+
+  void _checkPasswordRules() {
+    final password = _passwordController.text;
+
+    setState(() {
+      _isMinLength = password.length >= 8;
+      _hasUppercase = password.contains(RegExp(r'[A-Z]'));
+      _hasLowercase = password.contains(RegExp(r'[a-z]'));
+      _hasNumber = password.contains(RegExp(r'[0-9]'));
+      _hasSpecialChar = password.contains(RegExp(r'[!@#\$&*~\.\-_\+]'));
+    });
   }
 
   // Função para redefinir a senha
@@ -103,12 +126,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Erro', style: TextStyle(color: Colors.red)),
+          title: Text('Erro',
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
           content: Row(
             children: [
-              Icon(Icons.error, color: Colors.red),
+              Icon(Icons.error, color: Theme.of(context).colorScheme.error),
               SizedBox(width: 10.w),
-              Expanded(child: Text(message)),
+              Expanded(
+                child: Text(
+                  message,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ),
             ],
           ),
           actions: <Widget>[
@@ -130,12 +161,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sucesso', style: TextStyle(color: Colors.green)),
+          title: Text('Sucesso',
+              style: TextStyle(color: successColorLight)),
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green),
+              Icon(Icons.check_circle,
+                  color: successColorLight),
               SizedBox(width: 10.w),
-              Expanded(child: Text('Senha redefinida com sucesso!')),
+              Expanded(
+                child: Text(
+                  'Senha redefinida com sucesso!',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ),
             ],
           ),
           actions: [
@@ -158,17 +198,209 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   void dispose() {
+    _passwordController.removeListener(_checkPasswordRules);
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Método para construir o campo de senha
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      enabled: !_isLoading,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+      decoration: InputDecoration(
+        labelText: 'Nova Senha',
+        labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, insira sua nova senha';
+        }
+        if (!_isMinLength ||
+            !_hasUppercase ||
+            !_hasLowercase ||
+            !_hasNumber ||
+            !_hasSpecialChar) {
+          return 'A senha não atende aos requisitos';
+        }
+        return null;
+      },
+    );
+  }
+
+  // Método para construir o campo de confirmação de senha
+  Widget _buildConfirmPasswordField() {
+    return TextFormField(
+      controller: _confirmPasswordController,
+      obscureText: _obscureConfirmPassword,
+      enabled: !_isLoading,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+      decoration: InputDecoration(
+        labelText: 'Confirme a Nova Senha',
+        labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscureConfirmPassword = !_obscureConfirmPassword;
+            });
+          },
+        ),
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, confirme sua nova senha';
+        }
+        if (value != _passwordController.text) {
+          return 'As senhas não correspondem';
+        }
+        return null;
+      },
+    );
+  }
+
+  // Método para construir o card com as regras da senha
+  Widget _buildPasswordRulesCard() {
+    return Card(
+      color: Theme.of(context).colorScheme.surfaceVariant,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'A senha deve conter:',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            SizedBox(height: 10.h),
+            _buildRuleItem('Pelo menos 8 caracteres', _isMinLength),
+            _buildRuleItem('Uma letra maiúscula (A-Z)', _hasUppercase),
+            _buildRuleItem('Uma letra minúscula (a-z)', _hasLowercase),
+            _buildRuleItem('Um número (0-9)', _hasNumber),
+            _buildRuleItem(
+                'Um caractere especial (!@#\$&*~.-_+)', _hasSpecialChar),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRuleItem(String text, bool isValid) {
+    return Row(
+      children: [
+        Icon(
+          isValid ? Icons.check_circle : Icons.radio_button_unchecked,
+          color: isValid
+              ? Colors.green
+              : Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 20.sp,
+        ),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isValid
+                      ? Colors.green
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Método para construir o botão de redefinir senha
+  Widget _buildResetButton() {
+    return SizedBox(
+      width: 180.w,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _resetPassword,
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.r),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+        child: _isLoading
+            ? const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
+            : Text('Redefinir Senha',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: 18.sp,
+                    )),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Redefinir Senha', style: TextStyle(fontSize: 18.sp)),
-        backgroundColor: Colors.lightBlue.shade700,
+        title: Text(
+          'Redefinir Senha',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
@@ -177,114 +409,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 50.h),
+                SizedBox(height: 20.h),
+                Icon(
+                  Icons.lock_reset,
+                  size: 80.sp,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                SizedBox(height: 20.h),
                 Text(
                   'Digite sua nova senha para redefinir.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16.sp),
-                ),
-                SizedBox(height: 20.h),
-
-                // Campo de Nova Senha
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  enabled: !_isLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Nova Senha',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: 16.sp,
+                        color: Theme.of(context).colorScheme.onBackground,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira sua nova senha';
-                    }
-                    if (value.length < 8) {
-                      return 'A senha deve ter pelo menos 8 caracteres';
-                    }
-                    if (!RegExp(r'(?=.*?[A-Z])').hasMatch(value)) {
-                      return 'A senha deve ter pelo menos uma letra maiúscula';
-                    }
-                    if (!RegExp(r'(?=.*?[a-z])').hasMatch(value)) {
-                      return 'A senha deve ter pelo menos uma letra minúscula';
-                    }
-                    if (!RegExp(r'(?=.*?[0-9])').hasMatch(value)) {
-                      return 'A senha deve ter pelo menos um número';
-                    }
-                    if (!RegExp(r'(?=.*?[!@#\$&*~.])').hasMatch(value)) {
-                      return 'A senha deve ter pelo menos um caractere especial';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: 20.h),
-
-                // Campo de Confirmação de Nova Senha
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: _obscureConfirmPassword,
-                  enabled: !_isLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Confirme a Nova Senha',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, confirme sua nova senha';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'As senhas não correspondem';
-                    }
-                    return null;
-                  },
-                ),
+                _buildPasswordField(),
+                SizedBox(height: 10.h),
+                _buildPasswordRulesCard(),
                 SizedBox(height: 20.h),
-
-                // Botão para redefinir senha
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _resetPassword,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightBlue.shade700,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 50.w,
-                      vertical: 15.h,
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white))
-                      : Text('Redefinir Senha',
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 18.sp)),
-                ),
+                _buildConfirmPasswordField(),
+                SizedBox(height: 30.h),
+                _buildResetButton(),
               ],
             ),
           ),
