@@ -44,8 +44,8 @@ class MyApp extends StatelessWidget {
             builder: (context, themeProvider, _) {
               return MaterialApp(
                 title: 'MindCare',
-                theme: lightTheme,
-                darkTheme: darkTheme,
+                theme: createTheme(Brightness.light, themeProvider.fontScale),
+                darkTheme: createTheme(Brightness.dark, themeProvider.fontScale),
                 themeMode: themeProvider.themeMode,
                 home: const AuthCheck(),
                 builder: (context, widget) {

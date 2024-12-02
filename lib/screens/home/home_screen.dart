@@ -8,6 +8,7 @@ import 'package:mindcare_app/screens/diary/diarioHumor_screen.dart';
 import 'package:mindcare_app/screens/profile/profile_screen.dart';
 import 'package:mindcare_app/screens/content/educationalContent_screen.dart';
 import 'package:mindcare_app/services/api_service.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -87,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
-        title: Text(
+        title: ScaledText(
           '$greeting, $userName!',
           style: theme.textTheme.headlineLarge!.copyWith(
             fontSize: 18.sp,
@@ -115,44 +116,52 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNavigationBar(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BottomNavigationBar(
-      backgroundColor: theme.bottomNavigationBarTheme.backgroundColor ??
-          theme.colorScheme.surface,
-      selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor ??
-          theme.colorScheme.primary,
-      unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor ??
-          theme.colorScheme.onSurface.withOpacity(0.7),
-      selectedFontSize: 14.sp,
-      unselectedFontSize: 12.sp,
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      items: [
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.home),
-          label: 'Home',
+    return Theme(
+      data: Theme.of(context).copyWith(
+        // Isso garante que os labels do BottomNavigationBar também escalarão
+        textTheme: Theme.of(context).textTheme.copyWith(
+          bodySmall: TextStyle(fontSize: 12.sp),
         ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.self_improvement),
-          label: 'Meditações',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.map),
-          label: 'Mapa',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.book),
-          label: 'Diário',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.chat_bubble_outline),
-          label: 'Comunidade',
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.person),
-          label: 'Perfil',
-        ),
-      ],
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor ??
+            theme.colorScheme.surface,
+        selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor ??
+            theme.colorScheme.primary,
+        unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor ??
+            theme.colorScheme.onSurface.withOpacity(0.7),
+        selectedFontSize: 14.sp,
+        unselectedFontSize: 12.sp,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.self_improvement),
+            label: 'Meditações',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.map),
+            label: 'Mapa',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.book),
+            label: 'Diário',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: 'Comunidade',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+      ),
     );
   }
 }

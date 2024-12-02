@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mindcare_app/theme/theme_provider.dart';
 import 'package:mindcare_app/screens/login/login_screen.dart';
 import 'package:mindcare_app/screens/help/help_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/screens/settings/accessibility_screen.dart';
+import 'package:mindcare_app/screens/settings/privacy_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -84,8 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -102,32 +100,45 @@ class _SettingsScreenState extends State<SettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Tema',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onBackground,
+              // Opção de Acessibilidade
+              ListTile(
+                title: Text(
+                  'Acessibilidade',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-              ),
-              SizedBox(height: 10.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Modo Escuro',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Theme.of(context).colorScheme.onSurface,
+                leading: Icon(Icons.accessibility_new, color: Colors.blueAccent),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AccessibilityScreen(),
                     ),
+                  );
+                },
+              ),
+              const Divider(),
+
+              // Adicionar opção de Privacidade
+              ListTile(
+                title: Text(
+                  'Privacidade',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  Switch(
-                    value: themeProvider.themeMode == ThemeMode.dark,
-                    onChanged: (value) {
-                      themeProvider.toggleTheme(value);
-                    },
-                  ),
-                ],
+                ),
+                leading: Icon(Icons.privacy_tip, color: Colors.blueAccent),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PrivacyScreen(),
+                    ),
+                  );
+                },
               ),
               const Divider(),
 

@@ -7,6 +7,7 @@ import 'package:mindcare_app/theme/theme.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class DiarioHumorScreen extends StatefulWidget {
   const DiarioHumorScreen({Key? key}) : super(key: key);
@@ -564,7 +565,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           "Diário de Humor",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -604,7 +605,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Seção de Registro de Emoções
-                Text(
+                ScaledText(
                   "Como você está se sentindo?",
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
@@ -688,7 +689,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                         spacing: 8,
                         children: _keywords
                             .map((keyword) => Chip(
-                                  label: Text(
+                                  label: ScaledText(
                                     keyword,
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
@@ -733,7 +734,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     ? AnimatedOpacity(
                         opacity: _isRegistered ? 1.0 : 0.0,
                         duration: const Duration(seconds: 1),
-                        child: Text(
+                        child: ScaledText(
                           "Humor registrado com sucesso!",
                           style: Theme.of(context)
                               .textTheme
@@ -748,7 +749,7 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                     : Container(),
 
                 const Divider(),
-                Text(
+                ScaledText(
                   "Histórico de Humor",
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
@@ -830,11 +831,11 @@ class _DiarioHumorScreenState extends State<DiarioHumorScreen> {
                               moodEmoji,
                               style: const TextStyle(fontSize: 32),
                             ),
-                            title: Text(
+                            title: ScaledText(
                               texto,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                            subtitle: Text(
+                            subtitle: ScaledText(
                               "Registrado em ${formatarData(createdAt)} às ${formatarHora(createdAt)}",
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),

@@ -7,6 +7,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mindcare_app/theme/theme.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -39,7 +40,7 @@ class _MapScreenState extends State<MapScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Theme.of(context).colorScheme.error,
-          content: Text(
+          content: ScaledText(
             'Permissão de localização negada',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onError,
@@ -91,7 +92,7 @@ class _MapScreenState extends State<MapScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Theme.of(context).colorScheme.error,
-          content: Text(
+          content: ScaledText(
             'Erro ao carregar pontos de apoio: $e',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onError,
@@ -105,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
   void _onMarkerTapped(Map<String, dynamic> point) {
 
      FocusScope.of(context).unfocus();
-     
+
     _mapController.animateCamera(
       CameraUpdate.newLatLngZoom(
         LatLng(point['position']['lat'], point['position']['lng']),
@@ -134,12 +135,12 @@ class _MapScreenState extends State<MapScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                ScaledText(
                   point['title'],
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 SizedBox(height: 8.h),
-                Text(
+                ScaledText(
                   point['address'],
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -158,7 +159,7 @@ class _MapScreenState extends State<MapScreen> {
                       direction: Axis.horizontal,
                     ),
                     SizedBox(width: 8.w),
-                    Text(
+                    ScaledText(
                       point['rating'] != null
                           ? '${point['rating']}'
                           : 'Sem avaliação',
@@ -170,7 +171,7 @@ class _MapScreenState extends State<MapScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    ScaledText(
                       'Horário:',
                       style: Theme.of(context)
                           .textTheme
@@ -182,7 +183,7 @@ class _MapScreenState extends State<MapScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          ScaledText(
                             point['opening_hours']?['status'] ??
                                 'Status não disponível',
                             style: Theme.of(context)
@@ -203,14 +204,14 @@ class _MapScreenState extends State<MapScreen> {
                               children: List.generate(
                                   point['opening_hours']['text'].length,
                                   (index) {
-                                return Text(
+                                return ScaledText(
                                   point['opening_hours']['text'][index],
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 );
                               }),
                             )
                           else
-                            Text(
+                            ScaledText(
                               'Horário não disponível',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
@@ -233,7 +234,7 @@ class _MapScreenState extends State<MapScreen> {
                         Icons.directions,
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                      label: Text(
+                      label: ScaledText(
                         'Obter Direção',
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -250,7 +251,7 @@ class _MapScreenState extends State<MapScreen> {
                         Icons.streetview,
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                      label: Text(
+                      label: ScaledText(
                         'Street View',
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -321,7 +322,7 @@ class _MapScreenState extends State<MapScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
-        content: Text(
+        content: ScaledText(
           message,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onError,
@@ -371,7 +372,7 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilterChip(
-                      label: Text(
+                      label: ScaledText(
                         "CRAS",
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -386,7 +387,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     SizedBox(width: 8.w),
                     FilterChip(
-                      label: Text(
+                      label: ScaledText(
                         "Psiquiátricas",
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -401,7 +402,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     SizedBox(width: 8.w),
                     FilterChip(
-                      label: Text(
+                      label: ScaledText(
                         "Psicólogos",
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),

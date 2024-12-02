@@ -8,6 +8,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindcare_app/screens/settings/settings_screen.dart';
 import 'package:mindcare_app/screens/content/content_management_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/services/api_service.dart';
+import 'package:mindcare_app/theme/theme.dart'; // Adicione a importação do ApiService
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({Key? key}) : super(key: key);
@@ -19,6 +22,7 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final ImagePicker _picker = ImagePicker();
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  final ApiService _apiService = ApiService(); // Instancie o ApiService
   File? _selectedImage;
   bool isEditing = false;
   bool isLoading = false;
@@ -30,6 +34,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final TextEditingController bioController = TextEditingController();
   final TextEditingController currentPasswordController =
       TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   String userRole = "user";
   String? profileImageUrl;
@@ -82,6 +87,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         nameController.text = data['name'] ?? '';
         emailController.text = data['email'] ?? '';
         bioController.text = data['bio'] ?? '';
+        phoneController.text = data['phone'] ?? ''; // Add this line
         userRole = data['role'] ?? 'user';
 
         setState(() {
@@ -115,7 +121,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       isEditing = !isEditing;
       // Fechar o teclado virtual ao sair do modo de edição
       FocusScope.of(context).unfocus();
-      
     });
   }
 
@@ -162,59 +167,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
 
     try {
-      String? token = await _secureStorage.read(key: 'authToken');
-      if (token == null) {
-        _showError('Erro de autenticação. Faça login novamente.');
-        Navigator.pushReplacementNamed(context, '/login');
-        return;
-      }
-
-      final requestBody = {
-        'name': nameController.text,
-        'email': emailController.text,
-        'bio': bioController.text,
-        'currentPassword': currentPasswordController.text,
-        'newPassword': newPasswordController.text,
-      };
-
-      String? imageUrl;
-      if (_selectedImage != null) {
-        imageUrl = await uploadImage(_selectedImage!, token);
-      }
-
-      if (imageUrl != null) {
-        requestBody['profileImage'] = imageUrl;
-      }
-
-      final response = await http.put(
-        Uri.parse('https://mindcare-bb0ea3046931.herokuapp.com/auth/profile'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(requestBody),
+      await _apiService.updateProfile(
+        name: nameController.text,
+        bio: bioController.text,
+        phone: phoneController.text,
+        email: emailController.text,
+        password: currentPasswordController.text,
+        newPassword: newPasswordController.text,
+        image: _selectedImage,
       );
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            content: Text(
-              'Perfil atualizado com sucesso!',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                  ),
-            ),
+      currentPasswordController.clear();
+      newPasswordController.clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: successColorLight,
+          content: ScaledText(
+            'Perfil atualizado com sucesso!',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color:msg,
+                ),
           ),
-        );
-        toggleEditMode();
-      } else {
-        final message =
-            jsonDecode(response.body)['msg'] ?? 'Erro ao atualizar o perfil.';
-        _showError(message);
-      }
+        ),
+      );
+      toggleEditMode();
     } catch (e) {
-      _showError('Erro de rede. Tente novamente mais tarde.');
+      _showError('Erro ao atualizar o perfil. Tente novamente.');
     } finally {
       setState(() {
         isLoading = false;
@@ -252,7 +231,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
-        content: Text(
+        content: ScaledText(
           message,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onError,
@@ -266,7 +245,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           isEditing ? 'Editar Perfil' : 'Perfil do Usuário',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -301,7 +280,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Icons.edit,
                     color: Theme.of(context).iconTheme.color,
                   ),
-                  title: Text(
+                  title: ScaledText(
                     'Editar Informações',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -314,7 +293,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Icons.settings,
                     color: Theme.of(context).iconTheme.color,
                   ),
-                  title: Text(
+                  title: ScaledText(
                     'Configurações',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -352,7 +331,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          ScaledText(
                             nameController.text,
                             style: Theme.of(context).textTheme.headlineMedium,
                           ),
@@ -364,7 +343,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ],
                       ),
                       SizedBox(height: 8.h),
-                      Text(
+                      ScaledText(
                         bioController.text,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Theme.of(context).colorScheme.onBackground,
@@ -382,7 +361,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ContentManagementScreen()),
                             );
                           },
-                          child: Text(
+                          child: ScaledText(
                             'Gerenciar Conteúdos',
                             style: Theme.of(context)
                                 .textTheme
@@ -411,12 +390,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         label: 'Email',
                       ),
                       _buildTextField(
+                        controller: phoneController,
+                        label: 'Telefone',
+                      ),
+                      _buildTextField(
                         controller: currentPasswordController,
                         label: 'Senha Atual',
                         obscureText: _isCurrentPasswordObscured,
                         toggleObscureText: () {
                           setState(() {
-                            _isCurrentPasswordObscured = !_isCurrentPasswordObscured;
+                            _isCurrentPasswordObscured =
+                                !_isCurrentPasswordObscured;
                           });
                         },
                       ),
@@ -433,7 +417,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       SizedBox(height: 20.h),
                       ElevatedButton(
                         onPressed: saveProfile,
-                        child: Text(
+                        child: ScaledText(
                           'Salvar Alterações',
                           style: Theme.of(context)
                               .textTheme
@@ -445,7 +429,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       TextButton(
                         onPressed: toggleEditMode,
-                        child: Text(
+                        child: ScaledText(
                           'Cancelar',
                           style: Theme.of(context)
                               .textTheme
@@ -512,7 +496,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         color: color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child: Text(
+      child: ScaledText(
         text,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: color,

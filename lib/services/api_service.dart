@@ -185,7 +185,7 @@ class ApiService {
     }
   }
 
- // Função para buscar pontos de apoio próximos
+  // Função para buscar pontos de apoio próximos
   Future<Map<String, dynamic>> fetchNearbySupportPoints({
     required double latitude,
     required double longitude,
@@ -340,7 +340,7 @@ class ApiService {
   }
 
   // Função para buscar entradas de humor com filtros (daily, weekly, monthly)
- Future<Map<String, dynamic>> fetchDiaryEntries(String filter,
+  Future<Map<String, dynamic>> fetchDiaryEntries(String filter,
       {int page = 1, int limit = 10}) async {
     final token = await _getToken();
 
@@ -354,8 +354,8 @@ class ApiService {
       queryParams['filter'] = filter;
     }
 
-    final uri =
-        Uri.parse('$baseUrl/diary/entries').replace(queryParameters: queryParams);
+    final uri = Uri.parse('$baseUrl/diary/entries')
+        .replace(queryParameters: queryParams);
 
     final response =
         await getRequestWithAuth(Endpoint(uri.path + '?' + uri.query), token);
@@ -531,8 +531,7 @@ class ApiService {
     }
   }
 
- //---------------------------------------------------------------------------
-
+  //---------------------------------------------------------------------------
 
   // Função para listar artigos pendentes de aprovação com paginação
   Future<http.Response> getPendingArticles(
@@ -559,7 +558,7 @@ class ApiService {
     }
   }
 
- // Função para listar artigos aprovados com paginação
+  // Função para listar artigos aprovados com paginação
   Future<http.Response> getApprovedArticles(
       {int page = 1, int limit = 10}) async {
     try {
@@ -657,4 +656,113 @@ class ApiService {
     }
   }
 
+  // Função para atualizar o perfil do usuário
+  Future<void> updateProfile({
+    String? name,
+    String? bio,
+    String? phone,
+    String? email,
+    String? password,
+    String? newPassword,
+    File? image,
+  }) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/auth/profile');
+
+    try {
+      final request = http.MultipartRequest('PUT', url)
+        ..headers['Authorization'] = 'Bearer ${token.value}';
+
+      if (name != null) request.fields['name'] = name;
+      if (bio != null) request.fields['bio'] = bio;
+      if (phone != null) request.fields['phone'] = phone;
+      if (email != null) request.fields['email'] = email;
+      if (password != null) request.fields['password'] = password;
+      if (newPassword != null) request.fields['newPassword'] = newPassword;
+
+      if (image != null) {
+        final mimeType = lookupMimeType(image.path) ?? 'image/jpeg';
+        final mimeParts = mimeType.split('/');
+
+        final imageFile = await http.MultipartFile.fromPath(
+          'image',
+          image.path,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
+        );
+        request.files.add(imageFile);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200) {
+        throw Exception('Erro ao atualizar perfil: ${response.body}');
+      }
+    } catch (e) {
+      logger.e('Erro ao atualizar perfil: $e');
+      throw Exception('Erro ao atualizar perfil.');
+    }
+  }
+
+  // Função para deletar a conta do usuário
+  Future<Map<String, dynamic>> deleteAccount() async {
+    try {
+      final token = await _getToken();
+      final response =
+          await deleteRequestWithAuth(Endpoint('/auth/delete-account'), token);
+
+      if (response.statusCode == 200) {
+        // Limpar dados locais após deletar a conta
+        await _secureStorage.deleteAll();
+        currentUserId = null;
+
+        return jsonDecode(response.body);
+      } else {
+        logger.e('Erro ao deletar conta: ${response.body}');
+        throw Exception('Erro ao deletar conta: ${response.statusCode}');
+      }
+    } catch (e) {
+      logger.e('Erro ao deletar conta: $e');
+      throw Exception('Erro ao processar a solicitação de exclusão da conta.');
+    }
+  }
+
+
+ /* Não funcional
+  Future<Map<String, dynamic>> checkAccountDeletionStatus() async {
+    try {
+      final token = await _getToken();
+      final response = await getRequestWithAuth(
+        Endpoint('/auth/deletion-status'),
+        token,
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Erro ao verificar status da conta');
+      }
+    } catch (e) {
+      logger.e('Erro ao verificar status de exclusão: $e');
+      throw Exception('Erro ao verificar status da conta');
+    }
+  }
+
+  Future<void> cancelAccountDeletion() async {
+    try {
+      final token = await _getToken();
+      final response = await postRequestWithAuth(
+        Endpoint('/auth/cancel-deletion'),
+        {},
+        token,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Erro ao cancelar exclusão da conta');
+      }
+    } catch (e) {
+      logger.e('Erro ao cancelar exclusão: $e');
+      throw Exception('Erro ao processar a solicitação');
+    }
+  } */
 }

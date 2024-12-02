@@ -35,7 +35,7 @@ dependencies:
 
   # Funcionalidades de segurança e armazenamento local
   flutter_secure_storage: ^9.2.2
-  shared_preferences: ^2.3.2
+  shared_preferences: ^2.3.3
   jwt_decoder: ^2.0.1
 
   # Conexões de rede e manipulação de dados

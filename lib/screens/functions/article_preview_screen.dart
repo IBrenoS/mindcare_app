@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class ArticlePreviewScreen extends StatefulWidget {
   final dynamic article;
@@ -26,7 +27,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
+          content: ScaledText(
             "Não foi possível abrir o link do artigo.",
             style: Theme.of(context)
                 .textTheme
@@ -49,7 +50,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -89,7 +90,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
                 ),
               ),
             // Título do artigo
-            Text(
+            ScaledText(
               title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -98,7 +99,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
             ),
             SizedBox(height: 8.0.h),
             // Autor do artigo
-            Text(
+            ScaledText(
               'Autor: $author',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -106,7 +107,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
             ),
             SizedBox(height: 16.0.h),
             // Conteúdo do artigo com opção de expandir
-            Text(
+            ScaledText(
               _isExpanded ? content : '${content.substring(0, 200)}...',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     height: 1.5,
@@ -117,7 +118,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
             // Botão de "Leia Mais" para expandir o conteúdo completo
             TextButton(
               onPressed: _toggleReadMore,
-              child: Text(
+              child: ScaledText(
                 _isExpanded ? "Mostrar menos" : "Leia mais",
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
@@ -132,7 +133,7 @@ class _ArticlePreviewScreenState extends State<ArticlePreviewScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () => _launchURL(articleUrl),
                   icon: Icon(Icons.open_in_browser),
-                  label: Text(
+                  label: ScaledText(
                     "Abrir Artigo Original",
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onPrimary),

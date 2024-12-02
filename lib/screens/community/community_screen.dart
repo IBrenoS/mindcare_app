@@ -6,6 +6,7 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'package:mindcare_app/utils/time_formatter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mindcare_app/theme/theme.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({Key? key}) : super(key: key);
@@ -214,13 +215,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                     ? comment["userId"]["photoUrl"] ?? ""
                                     : ""),
                           ),
-                          title: Text(
+                          title: ScaledText(
                             comment["userId"] is Map
                                 ? comment["userId"]["name"] ?? "Usuário"
                                 : "Usuário Desconhecido",
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                          subtitle: Text(
+                          subtitle: ScaledText(
                             comment["comment"] ?? "",
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
@@ -455,7 +456,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           'Comunidade',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -491,94 +492,93 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   }
                   final post = posts[index];
                   bool isLiked = post['isLikedByCurrentUser'] ?? false;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(post["userId"]["photoUrl"] ?? ''),
-                          radius: 24.r,
-                        ),
-                        title: Text(
-                          post["userId"]["name"] ?? 'Usuário',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        subtitle: Text(
-                          formatarTempoEmPortugues(
-                            DateTime.parse(post["createdAt"]),
-                          ),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                      if (post["imageUrl"] != null)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8.r),
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: Image.network(
-                              post["imageUrl"],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 200.h,
-                            ),
-                          ),
-                        ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 8.h),
-                        child: Text(
-                          post["content"] ?? '',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Row(
-                          children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: isLiked
-                                        ? likeColor // Usa a constante likeColor importada do theme.dart
-                                        : Theme.of(context).iconTheme.color,
-                                    size: 24.sp,
-                                  ),
-                                  onPressed: () {
-                                    toggleLikePost(post['_id'], isLiked);
-                                  },
-                                ),
-                                Text(
-                                  '${post["likes"]?.length ?? 0}',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.mode_comment_outlined,
-                                color: Theme.of(context).iconTheme.color,
-                                size: 24.sp,
-                              ),
-                              onPressed: () {
-                                _showCommentsModal(
-                                    context, post["comments"], post["_id"]);
-                              },
-                            ),
-                            Text(
-                              '${post["comments"]?.length ?? 0} comentários',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
+                  return _buildPost(post, isLiked);
                 },
               ),
             ),
+    );
+  }
+
+  Widget _buildPost(dynamic post, bool isLiked) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(post["userId"]["photoUrl"] ?? ''),
+            radius: 24.r,
+          ),
+          title: ScaledText(
+            post["userId"]["name"] ?? 'Usuário',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          subtitle: ScaledText(
+            formatarTempoEmPortugues(DateTime.parse(post["createdAt"])),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        if (post["imageUrl"] != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Image.network(
+                post["imageUrl"],
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 200.h,
+              ),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: ScaledText(
+            post["content"] ?? '',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Row(
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.favorite,
+                      color: isLiked
+                          ? likeColor // Usa a constante likeColor importada do theme.dart
+                          : Theme.of(context).iconTheme.color,
+                      size: 24.sp,
+                    ),
+                    onPressed: () {
+                      toggleLikePost(post['_id'], isLiked);
+                    },
+                  ),
+                  ScaledText(
+                    '${post["likes"]?.length ?? 0}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.mode_comment_outlined,
+                  color: Theme.of(context).iconTheme.color,
+                  size: 24.sp,
+                ),
+                onPressed: () {
+                  _showCommentsModal(context, post["comments"], post["_id"]);
+                },
+              ),
+              ScaledText(
+                '${post["comments"]?.length ?? 0} comentários',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

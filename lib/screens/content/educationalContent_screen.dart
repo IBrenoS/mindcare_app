@@ -3,6 +3,7 @@ import 'package:mindcare_app/services/api_service.dart';
 import 'dart:convert';
 import 'package:mindcare_app/screens/content/articleDetail_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class EducationalContentScreen extends StatefulWidget {
   const EducationalContentScreen({Key? key}) : super(key: key);
@@ -75,7 +76,7 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           "Conteúdo Educativo",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -96,7 +97,7 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      ScaledText(
                         "Erro ao carregar artigos ou nenhum artigo disponível.",
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
@@ -104,7 +105,7 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                       SizedBox(height: 10.h),
                       ElevatedButton(
                         onPressed: _loadApprovedArticles,
-                        child: Text(
+                        child: ScaledText(
                           "Tentar novamente",
                           style: Theme.of(context)
                               .textTheme
@@ -165,7 +166,7 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                               fit: BoxFit.cover,
                             ),
                           ),
-                          title: Text(
+                          title: ScaledText(
                             article['title'] ?? '',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -178,14 +179,14 @@ class _EducationalContentScreenState extends State<EducationalContentScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 5.h),
-                              Text(
+                              ScaledText(
                                 article['summary'] ?? '',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               SizedBox(height: 5.h),
-                              Text(
+                              ScaledText(
                                 "Por ${article['author'] ?? 'Desconhecido'} - ${article['source'] ?? ''}",
                                 style: Theme.of(context)
                                     .textTheme

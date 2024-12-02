@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mindcare_app/utils/text_scale_helper.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   final Map<String, dynamic> article;
@@ -13,7 +14,7 @@ class ArticleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: ScaledText(
           article['title'] ?? "Artigo",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -61,19 +62,19 @@ class ArticleDetailScreen extends StatelessWidget {
                 ),
               ),
             SizedBox(height: 10.h),
-            Text(
+            ScaledText(
               article['title'] ?? '',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             SizedBox(height: 10.h),
-            Text(
+            ScaledText(
               "Por ${article['author'] ?? 'Autor desconhecido'} - ${article['source'] ?? 'Fonte desconhecida'}",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onBackground,
                   ),
             ),
             SizedBox(height: 20.h),
-            Text(
+            ScaledText(
               article['content'] ??
                   "Este é um resumo. Para ler o artigo completo, acesse o link abaixo.",
               style: Theme.of(context).textTheme.bodyLarge,
@@ -84,7 +85,7 @@ class ArticleDetailScreen extends StatelessWidget {
                 Icons.link,
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
-              label: Text(
+              label: ScaledText(
                 "Leia o artigo completo",
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -100,7 +101,7 @@ class ArticleDetailScreen extends StatelessWidget {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
+                      content: ScaledText(
                         "Não foi possível abrir o link.",
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onError,
