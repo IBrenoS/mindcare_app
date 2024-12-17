@@ -13,6 +13,10 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    def keystorePropertiesFile = rootProject.file("key.properties")
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -23,23 +27,39 @@ android {
     }
 
     defaultConfig {
-    applicationId = "br.com.mindcareapp.mindcare_app"
-    minSdk = flutter.minSdkVersion
-    targetSdk = flutter.targetSdkVersion
-    versionCode = flutter.versionCode
-    versionName = flutter.versionName
+        applicationId = "br.com.mindcareapp.mindcare_app"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
 
-    manifestPlaceholders = [
-        MAPS_API_KEY: "${System.getenv("MAPS_API_KEY") ?: ""}",
-        applicationName: "io.flutter.app.FlutterApplication"
-    ]
-}
+        manifestPlaceholders = [
+            MAPS_API_KEY: "${System.getenv("MAPS_API_KEY") ?: ""}",
+            applicationName: "io.flutter.app.FlutterApplication"
+        ]
+    }
 
-
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                          'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
         }
     }
 }

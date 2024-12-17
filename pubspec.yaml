@@ -30,9 +30,6 @@ dependencies:
   youtube_player_flutter: ^9.1.1
   cached_network_image: ^3.4.1
 
-  # Notificações e mensagens push
-
-
   # Funcionalidades de segurança e armazenamento local
   flutter_secure_storage: ^9.2.2
   shared_preferences: ^2.3.3
